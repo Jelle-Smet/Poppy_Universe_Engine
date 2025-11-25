@@ -119,6 +119,9 @@ namespace Poppy_Universe_Engine
             int topPerType = 5
         )
         {
+            // If 0 or negative, use default of 5
+            if (topPerType <= 0) topPerType = 5;
+
             stars ??= new List<Star_View>();
             planets ??= new List<Planet_View>();
             moons ??= new List<Moon_View>();

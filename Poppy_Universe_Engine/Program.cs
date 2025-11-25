@@ -190,8 +190,9 @@ namespace Poppy_Universe_Engine
             };
 
             // Apply popularity boost (max 25% of theoretical max score)
+            int Top_Recommendations_Amount = 10; // Change this to control how many per type, or set to 0 for default 5
             var booster = new Layer_2_PoppysTrendBooster();
-            booster.BoostAll(recommendedStars, recommendedPlanets, recommendedMoons, interactions, topPerType: 5);
+            booster.BoostAll(recommendedStars, recommendedPlanets, recommendedMoons, interactions, topPerType: Top_Recommendations_Amount);
 
             // Display Layer 2 Results (Boosted)
             Console.WriteLine("🌟 ═══════════════ POPULAR STARS (BOOSTED) ═══════════════ 🌟\n");
