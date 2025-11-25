@@ -1,0 +1,17 @@
+# === C# / .NET ===
+Poppy_Universe_Engine/bin/
+Poppy_Universe_Engine/obj/
+Poppy_Universe_Engine/.vs/
+*.user
+*.suo
+*.log
+*.tmp
+
+# === Node / frontend (if added here later) ===
+node_modules/
+dist/
+.env
+
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
