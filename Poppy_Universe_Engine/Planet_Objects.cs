@@ -7,6 +7,7 @@ namespace Poppy_Universe_Engine
         // Basic Properties
         public int Id { get; set; }                             // ID
         public string Name { get; set; }
+        public string Type { get; set; }
         public string Color { get; set; }
         public double DistanceFromSun { get; set; } // 10^6 km (average)
         public double DistanceFromEarth { get; set; } // 10^6 km (average)

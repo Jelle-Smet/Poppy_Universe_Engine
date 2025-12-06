@@ -1,9 +1,10 @@
 ﻿namespace Poppy_Universe_Engine
 {
-    internal class Planet_View
+    public class Planet_View
     {
         public Planet_Objects Planet { get; set; }
         public int Id { get; set; }
+        public string Type { get; set; }
         public double Altitude { get; set; }       // Angle above horizon
         public double Azimuth { get; set; }        // Direction along horizon
         public bool IsVisible { get; set; }

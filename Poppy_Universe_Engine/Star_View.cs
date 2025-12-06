@@ -8,7 +8,7 @@ using System.Transactions;
 namespace Poppy_Universe_Engine
 {
     // A view object of the star for recommendations
-    internal class Star_View
+    public class Star_View
     {
         public Star_Objects Star { get; set; }  // All original star info
         public int Id { get; set; }
@@ -21,6 +21,7 @@ namespace Poppy_Universe_Engine
         public double VisibilityChance { get; set; } // The chance of visibility taking weather conditions into account.
         public string ChanceReason { get; set; }    // Explanation of the visibility chance
         public string BoostDescription { get; set; }
+        public string SpectralType { get; set; }
 
     }
 }

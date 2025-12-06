@@ -7,11 +7,11 @@ namespace Poppy_Universe_Engine
 {
     internal class VisibilityCalculator
     {
-        private readonly Fake_User user;
+        private readonly User_Object user;
         private static readonly HttpClient client = new HttpClient();
         private int hours;
 
-        internal VisibilityCalculator(Fake_User u)
+        internal VisibilityCalculator(User_Object u)
         {
             user = u ?? throw new ArgumentNullException(nameof(u));
         }

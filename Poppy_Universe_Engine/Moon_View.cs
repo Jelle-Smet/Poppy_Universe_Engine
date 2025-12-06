@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace Poppy_Universe_Engine
 {
-    internal class Moon_View
+    public class Moon_View
     {
         public Moon_Objects Moon { get; set; }
         public int Id { get; set; }
+        public string Parent { get; set; }
         public double Altitude { get; set; }
         public double Azimuth { get; set; }
         public bool IsVisible { get; set; }
