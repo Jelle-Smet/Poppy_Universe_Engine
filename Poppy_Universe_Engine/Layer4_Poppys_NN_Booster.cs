@@ -20,9 +20,9 @@ namespace Poppy_Universe_Engine
     public class Layer_4_Poppys_NN_Booster
     {
         // Increased weights since NN predictions are more sophisticated
-        private const double PREF_WEIGHT = 0.7;  // Higher personalization influence (was 0.6)
-        private const double BASE_WEIGHT = 0.3;  // Lower base relevance (was 0.4)
-        private const double MAX_BOOST_RATIO = 0.85; // Higher cap at 85% (was 0.75) - NN is more confident
+        private const double PREF_WEIGHT = 0.7;	 // Higher personalization influence (was 0.6)
+        private const double BASE_WEIGHT = 0.3;	 // Lower base relevance (was 0.4)
+        private const double MAX_BOOST_RATIO = 0.75; // Higher cap at 75% (was 0.5) - NN is more confident
 
         private double Normalize(double v) => Math.Max(0, Math.Min(10, v)) / 10.0;
 
@@ -104,6 +104,8 @@ namespace Poppy_Universe_Engine
 
                 if (matchPct > 0 && score > 0)
                 {
+                    // This calculation is the source of the precision issue, 
+                    // as it uses existing rounded scores/percentages to determine the new max.
                     double calculatedMax = score / (matchPct / 100.0);
                     if (calculatedMax > maxPossibleScore)
                     {
@@ -134,13 +136,21 @@ namespace Poppy_Universe_Engine
                 if (boostedScore > maxAllowedForThisObject)
                     boostedScore = maxAllowedForThisObject;
 
+                // Global cap: Ensures score doesn't exceed the theoretical maximum
                 if (boostedScore > maxPossibleScore)
                     boostedScore = maxPossibleScore;
 
+                // Round the final score (this is where the numerator gets rounded up)
                 boostedScore = Math.Round(boostedScore, 2);
                 setFinalScore(obj, boostedScore);
 
+                // Calculate percentage using the rounded score (numerator) and unrounded max (denominator).
                 double newMatchPercentage = Math.Round((boostedScore / maxPossibleScore) * 100.0, 2);
+                
+                // FIX: Explicitly cap the displayed percentage to prevent floating-point overflow
+                if (newMatchPercentage > 100.00)
+                    newMatchPercentage = 100.00;
+
                 setMatchPct(obj, newMatchPercentage);
 
                 // Set BoostDescription with NN indicator
@@ -250,16 +260,16 @@ namespace Poppy_Universe_Engine
         {
             // Calculate average prediction strength across all categories
             var allPrefs = new List<double>
-        {
-            // Stars
-            prefs.A, prefs.B, prefs.F, prefs.G, prefs.K, prefs.M, prefs.O,
-            // Planets
-            prefs.DwarfPlanet, prefs.GasGiant, prefs.IceGiant, prefs.Terrestrial,
-            // Moons
-            prefs.Earth, prefs.Eris, prefs.Haumea, prefs.Jupiter,
-            prefs.Makemake, prefs.Mars, prefs.Neptune, prefs.Pluto,
-            prefs.Saturn, prefs.Uranus
-        };
+            {
+                // Stars
+                prefs.A, prefs.B, prefs.F, prefs.G, prefs.K, prefs.M, prefs.O,
+                // Planets
+                prefs.DwarfPlanet, prefs.GasGiant, prefs.IceGiant, prefs.Terrestrial,
+                // Moons
+                prefs.Earth, prefs.Eris, prefs.Haumea, prefs.Jupiter,
+                prefs.Makemake, prefs.Mars, prefs.Neptune, prefs.Pluto,
+                prefs.Saturn, prefs.Uranus
+            };
 
             double avgStrength = allPrefs.Average();
             double variance = allPrefs.Select(p => Math.Pow(p - avgStrength, 2)).Average();

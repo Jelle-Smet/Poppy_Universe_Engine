@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Poppy_Universe_Engine
 {
@@ -114,6 +116,11 @@ namespace Poppy_Universe_Engine
                 setFinalScore(obj, boostedScore);
 
                 double newMatchPercentage = Math.Round((boostedScore / maxPossibleScore) * 100.0, 2);
+
+                // FIX: Explicitly cap the displayed percentage to prevent floating-point overflow
+                if (newMatchPercentage > 100.00)
+                    newMatchPercentage = 100.00;
+
                 setMatchPct(obj, newMatchPercentage);
 
                 // Set BoostDescription

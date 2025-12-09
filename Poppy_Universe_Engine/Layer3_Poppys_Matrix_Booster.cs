@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Poppy_Universe_Engine
 {
@@ -16,7 +18,7 @@ namespace Poppy_Universe_Engine
     {
         private const double PREF_WEIGHT = 0.6; // Personalization influence
         private const double BASE_WEIGHT = 0.4; // Layer 1 base relevance
-        private const double MAX_BOOST_RATIO = 0.75; // Cap at 75% of theoretical max
+        private const double MAX_BOOST_RATIO = 0.5; // Cap at 50% of theoretical max
 
         private double Normalize(double v) => Math.Max(0, Math.Min(10, v)) / 10.0;
 
@@ -99,8 +101,8 @@ namespace Poppy_Universe_Engine
 
                 if (matchPct > 0 && score > 0)
                 {
-                    // This calculation seems designed to find the max theoretical score 
-                    // based on a non-boosted object's match percentage.
+                    // This calculation is the source of the precision issue, 
+                    // as it uses existing rounded scores/percentages to determine the new max.
                     double calculatedMax = score / (matchPct / 100.0);
                     if (calculatedMax > maxPossibleScore)
                     {
@@ -138,6 +140,11 @@ namespace Poppy_Universe_Engine
                 setFinalScore(obj, boostedScore);
 
                 double newMatchPercentage = Math.Round((boostedScore / maxPossibleScore) * 100.0, 2);
+
+                // FIX: Explicitly cap the displayed percentage to prevent floating-point overflow
+                if (newMatchPercentage > 100.00)
+                    newMatchPercentage = 100.00;
+
                 setMatchPct(obj, newMatchPercentage);
 
                 // Set BoostDescription
