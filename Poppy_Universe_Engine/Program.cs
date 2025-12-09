@@ -285,7 +285,7 @@ namespace Poppy_Universe_Engine
 
             // Define user preference matrix (from matrix factorization)
             // Values should be between 0-10, representing learned preferences
-            Layer3_User_Matrix_Object userPreferences = new Layer3_User_Matrix_Object
+            Layer3_User_Matrix_Object L3_userPreferences = new Layer3_User_Matrix_Object
             {
                 User_ID = 1,
 
@@ -317,16 +317,16 @@ namespace Poppy_Universe_Engine
                 Uranus = 6.0
             };
 
-            // Apply personalization boost (max 25% of theoretical max score)
-            int Top_Personalized_Amount = 10; // Change this to control how many per type
-            var personalizer = new Layer_3_Poppys_Matrix_Booster();
+            // Apply personalization boost (max 75% of theoretical max score)
+            int L3_Top_Personalized_Amount = 10; // Change this to control how many per type
+            var L3_personalizer = new Layer_3_Poppys_Matrix_Booster();
             // Capture the results in a new Layer3_Boost_Result object
-            var L3_Results = personalizer.BoostAll(
+            var L3_Results = L3_personalizer.BoostAll(
                 L1_recommendedStars, // Note: If L2 was run, this should probably be L2_recommendedStars
                 L1_recommendedPlanets, // If using L2, use L2_recommendedPlanets here
                 L1_recommendedMoons, // If using L2, use L2_recommendedMoons here
-                userPreferences,
-                topPerType: Top_Personalized_Amount
+                L3_userPreferences,
+                topPerType: L3_Top_Personalized_Amount
             );
 
             // Now you can assign the new lists from L3_Results
@@ -386,6 +386,116 @@ namespace Poppy_Universe_Engine
             Console.WriteLine($"   ✓ Total visible moons: {L3_recommendedMoons.Count(m => m.IsVisible)}\n");
 
             PrintSectionFooter("END OF LAYER 3");
+
+            // ═══════════════════════════════════════════════════════════════
+            // LAYER 4: PERSONALIZATION BOOST (NEURAL NETWORK)
+            // ═══════════════════════════════════════════════════════════════
+
+            PrintSectionHeader("LAYER 4 BOOSTING RESULTS (PERSONALIZATION)");
+
+            // Define user preference matrix (from NN Output)
+            // Values should be between 0-10, representing learned preferences
+            Layer4_User_NN_Object L4_userPreferences = new Layer4_User_NN_Object
+            {
+                User_ID = 1,
+
+                // Star preferences (spectral types)
+                A = 6.3,
+                B = 4.7,
+                F = 7.5,
+                G = 8.2,
+                K = 5.9,
+                M = 7.8,
+                O = 3.0,
+
+                // Planet preferences
+                DwarfPlanet = 5.2,
+                GasGiant = 7.9,
+                IceGiant = 6.8,
+                Terrestrial = 8.7,
+
+                // Moon preferences (by parent body)
+                Earth = 9.0,
+                Eris = 2.8,
+                Haumea = 3.1,
+                Jupiter = 9.2,
+                Makemake = 1.9,
+                Mars = 6.5,
+                Neptune = 7.1,
+                Pluto = 5.8,
+                Saturn = 8.3,
+                Uranus = 6.7
+            };
+
+            // Apply personalization boost (max 75% of theoretical max score)
+            int L4_Top_Personalized_Amount = 10; // Change this to control how many per type
+            var L4_personalizer = new Layer_4_Poppys_NN_Booster();
+            // Capture the results in a new Layer4_Boost_Result object
+            var L4_Results = L4_personalizer.BoostAll(
+                L1_recommendedStars, // Note: If L2 was run, this should probably be L2_recommendedStars
+                L1_recommendedPlanets, // If using L2, use L2_recommendedPlanets here
+                L1_recommendedMoons, // If using L2, use L2_recommendedMoons here
+                L4_userPreferences,
+                topPerType: L4_Top_Personalized_Amount
+            );
+
+            // Now you can assign the new lists from L4_Results
+            var L4_recommendedStars = L4_Results.RecommendedStars;
+            var L4_recommendedPlanets = L4_Results.RecommendedPlanets;
+            var L4_recommendedMoons = L4_Results.RecommendedMoons;
+
+
+            // Display Layer 4 Results (Personalized)
+            Console.WriteLine("🌟 ═══════════════ PERSONALIZED STARS (LAYER 4) ═══════════════ 🌟\n");
+            foreach (var view in L4_recommendedStars)
+            {
+                Console.WriteLine($"┌─ Star: {view.Star.Name}");
+                Console.WriteLine($"│  ID: {view.Source}");
+                Console.WriteLine($"│  Type: {view.SpectralType}");
+                Console.WriteLine($"│  Position: Alt {view.Altitude:F2}° | Az {view.Azimuth:F2}°");
+                Console.WriteLine($"│  Brightness (Gmag): {view.Star.Gmag}");
+                Console.WriteLine($"│  Visible: {view.IsVisible}");
+                Console.WriteLine($"│  Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})");
+                Console.WriteLine($"│    --> {view.BoostDescription}");
+                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                Console.WriteLine($"└─ {view.ChanceReason}\n");
+            }
+            Console.WriteLine($"   ✓ Total visible stars: {L3_recommendedStars.Count(s => s.IsVisible)}\n");
+
+            Console.WriteLine("🪐 ═══════════════ PERSONALIZED PLANETS (LAYER 4) ═══════════════ 🪐\n");
+            foreach (var view in L4_recommendedPlanets)
+            {
+                Console.WriteLine($"┌─ Planet: {view.Planet.Name}");
+                Console.WriteLine($"│  ID: {view.Id}");
+                Console.WriteLine($"│  Type: {view.Type}");
+                Console.WriteLine($"│  Position: Alt {view.Altitude:F2}° | Az {view.Azimuth:F2}°");
+                Console.WriteLine($"│  Properties: {view.Planet.Color} | Ø {view.Planet.Diameter:N0} km | {view.Planet.Mass} × 10²⁴kg");
+                Console.WriteLine($"│  Visible: {view.IsVisible}");
+                Console.WriteLine($"│  Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})");
+                Console.WriteLine($"│    --> {view.BoostDescription}");
+                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                Console.WriteLine($"└─ {view.ChanceReason}\n");
+            }
+            Console.WriteLine($"   ✓ Total visible planets: {L3_recommendedPlanets.Count(p => p.IsVisible)}\n");
+
+            Console.WriteLine("🌕 ═══════════════ PERSONALIZED MOONS (LAYER 4) ═══════════════ 🌕\n");
+            foreach (var view in L4_recommendedMoons)
+            {
+                Console.WriteLine($"┌─ Moon: {view.Moon.Name} (orbits {view.Parent})");
+                Console.WriteLine($"│  ID: {view.Id}");
+                Console.WriteLine($"│  Position: Alt {view.Altitude:F2}° | Az {view.Azimuth:F2}°");
+                Console.WriteLine($"│  Properties: Ø {view.Moon.Diameter:N0} km | Mass {view.Moon.Mass} × 10²⁴kg");
+                Console.WriteLine($"│  Composition: {view.Moon.Composition}");
+                Console.WriteLine($"│  Features: {view.Moon.SurfaceFeatures}");
+                Console.WriteLine($"│  Visible: {view.IsVisible}");
+                Console.WriteLine($"│  Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})");
+                Console.WriteLine($"│    --> {view.BoostDescription}");
+                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                Console.WriteLine($"└─ {view.ChanceReason}\n");
+            }
+            Console.WriteLine($"   ✓ Total visible moons: {L3_recommendedMoons.Count(m => m.IsVisible)}\n");
+
+            PrintSectionFooter("END OF LAYER 4");
         }
 
         // ═══════════════════════════════════════════════════════════════

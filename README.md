@@ -6,7 +6,7 @@
 
 > **Personalized recommendations, layered intelligence, all in C#**
 
-This repository contains the **Recommendation Engine** for the **Poppy Universe** project. It powers the user recommendation system using **layered calculations**. Currently rule-based, with advanced matrix-based layers planned for the future.
+This repository contains the **Recommendation Engine** for the **Poppy Universe** project. It powers the user recommendation system using **layered calculations**. A combination of rule-based, with / or advanced Mathematical-based layers.
 
 ---
 
@@ -16,7 +16,8 @@ This repository contains the **Recommendation Engine** for the **Poppy Universe*
 * **Framework:** .NET (Standard C# Project)
 * **Architecture:** Layered Recommendation Engine
     * **Layer 1 & 2:** Rule-based recommendations
-    * **Layer 3 & 4:** ...
+    * **Layer 3 & 4:** Matihimatical-based recommendations
+    * **Layer 5:** Business Logic recommendations (combination of layer 1,2,3 & 4)
 
 ---
 
@@ -27,7 +28,8 @@ Recommendation_Engine/
 ├── Poppy_Universe_Engine/      # C# project containing engine logic
 │   ├── Layer1.cs               # Personalized Rule-based calculations
 │   ├── Layer2.cs               # Popularity Rule-based calculations
-│   ├── Layer3.cs               # Placeholder for future enhancements
+│   ├── Layer3.cs               # Matrix Factorization calculations
+│   ├── Layer4.cs               # Neural Network calculations
 │   ├── Layer...                # Placeholder for future enhancements
 │   ├── WeatherWhecker.cs       # Weather conditions checker
 │   └── Program.cs              # Entry point
@@ -90,10 +92,60 @@ Recommendation_Engine/
 > - **Visibility info:**  
 >   - Inherits **visibility percentages** and explanations from Layer 1 (informational only, does not affect the score).
 
+# 🌌 Layer 3 — Matrix Factorization  
 
-### 🚀 Layer 3 — Matrix-Based Intelligence (Future)
-...
-### 🌠 Layer 4+ — Future Extensions
+> Layer 3 is the **type-level recommendation layer**. Its focus is on **semantic patterns across categories** like star types, planet types, and moon parent planets, rather than individual objects.  
+>
+> - **Purpose:** Capture **user preferences at the category level**, e.g., someone loves Gas Giants or M-type stars, and predict scores for unseen categories.  
+>
+> - **Inputs used:**  
+>   - Processed user interactions from **Database** (or raw interaction logs)  
+>   - Category definitions: Star types (O/B/A/F/G/K/M), Planet types (Terrestrial/Gas Giant/Ice Giant/Dwarf), Moon parent planets  
+>   - Interaction strength (1–5)  
+>
+> - **How it works:**  
+>   1. Builds a **User × Category matrix** where each row = user, each column = category, values = interaction strength.  
+>   2. Fills missing values with 0 and optionally normalizes scores.  
+>   3. Performs **matrix factorization** (collaborative filtering) to learn **latent features** representing user preferences and category characteristics.  
+>   4. Uses the factorized matrices to **predict missing interactions**, i.e., estimate how likely a user is to like a category they haven’t interacted with yet.  
+>
+> - **Returns:**  
+>   - A **predicted score for every user × category** combination  
+>   - Can be used to **rank categories** for recommendation or feed into Layer 4 for more advanced modeling  
+>
+> - **Visibility info:**  
+>   - Inherits **visibility percentages** from earlier layers (informational only)  
+>   - Helps explain why a category might be more relevant to a user at a given time  
+
+# 🌠 Layer 4 — Neural Network  
+
+> Layer 4 is the **advanced neural network layer**. Its focus is on **learning complex, nonlinear relationships** between users and categories to refine recommendations beyond what Layer 3 captures.  
+>
+> - **Purpose:** Improve prediction accuracy by capturing subtle patterns and interactions in user behavior.  
+>
+> - **Inputs used:**  
+>   - Processed user interactions from **Database** (or raw interaction logs)  
+>   - One-hot encoding for users and categories  
+>   - Interaction strength (1–5) as training labels  
+>
+> - **How it works:**  
+>   1. **Encodes users and categories** as input vectors for the neural network.  
+>   2. **Forward pass:** computes predicted interaction scores through multiple layers with nonlinear activations (tanh) to model complex patterns.  
+>   3. **Loss calculation:** measures prediction error against actual interaction strengths.  
+>   4. **Backpropagation:** updates weights and biases using gradient descent to minimize loss.  
+>   5. **Training loop:** iterates for multiple epochs until the network converges, optionally using mini-batches for efficiency.  
+>   6. Generates **predicted scores for all user × category combinations**, including previously unseen interactions.  
+>
+> - **Returns:**  
+>   - Refined **user × category predictions**  
+>   - Can be **ranked to recommend top categories** per user  
+>   - Output saved as CSV for integration with the recommendation engine  
+>
+> - **Visibility info:**  
+>   - Maintains **visibility percentages** from previous layers (informational only)  
+>   - Layer 4 predictions can optionally be weighted by visibility for final presentation
+
+### 🌠 Layer xx — Future Extensions
 ...
 
 ---
@@ -125,7 +177,7 @@ Each recommendation includes **visibility information**:
 
 ## 🌟 Future Plans
 
-* Add **matrix-based recommendation layers** (Layer 3 & 4).
+* Add **Business Logic** (Layer 5).
 * Fully integrate with backend, frontend, and ML modules.
 * Turn this into the **complete Poppy Universe project repo**, containing engine, frontend, backend, data, and ML.
 
