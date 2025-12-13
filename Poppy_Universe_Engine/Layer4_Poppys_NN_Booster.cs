@@ -6,29 +6,46 @@ using System.Threading.Tasks;
 
 namespace Poppy_Universe_Engine
 {
-    // New class to hold the results from the boost operation (Layer 4)
+    /// <summary>
+    /// Holds the results after applying the Layer 4 (Neural Network Prediction) boost operation.
+    /// </summary>
     public class Layer4_Boost_Result
     {
         public List<Star_View> RecommendedStars { get; set; }
         public List<Planet_View> RecommendedPlanets { get; set; }
         public List<Moon_View> RecommendedMoons { get; set; }
     }
+
+    // Internal class (if needed for structure, though the public one below is used)
     internal class Layer4_Poppys_NN_Booster
     {
-        
+        // Placeholder or unused internal declaration.
     }
+
+    /// <summary>
+    /// Applies a highly influential boost to object scores based on learned user preferences 
+    /// derived from a Neural Network (NN) model.
+    /// </summary>
     public class Layer_4_Poppys_NN_Booster
     {
-        // Increased weights since NN predictions are more sophisticated
-        private const double PREF_WEIGHT = 0.7;	 // Higher personalization influence (was 0.6)
-        private const double BASE_WEIGHT = 0.3;	 // Lower base relevance (was 0.4)
-        private const double MAX_BOOST_RATIO = 0.75; // Higher cap at 75% (was 0.5) - NN is more confident
+        // Constants reflecting the higher confidence placed in NN predictions
+        private const double PREF_WEIGHT = 0.7;	    // Higher personalization influence (was 0.6 in L3)
+        private const double BASE_WEIGHT = 0.3;	    // Lower base relevance (was 0.4 in L3)
+        private const double MAX_BOOST_RATIO = 0.75; // Higher cap at 75% (was 0.5 in L3)
 
+        /// <summary>
+        /// Normalizes an input value (v) against a maximum of 10 to produce a factor (0.0-1.0).
+        /// </summary>
         private double Normalize(double v) => Math.Max(0, Math.Min(10, v)) / 10.0;
 
+        /// <summary>
+        /// Calculates a star's preference score (0.0-1.0) based on its spectral type 
+        /// and the NN's learned preferences.
+        /// </summary>
         private double ComputeStarScore(Star_View s, Layer4_User_NN_Object prefs)
         {
             string type = s.Star.SpectralType.ToUpper();
+            // Match the star's spectral type to the NN-derived preference value
             double pref = type switch
             {
                 "A" => prefs.A,
@@ -43,9 +60,14 @@ namespace Poppy_Universe_Engine
             return Normalize(pref);
         }
 
+        /// <summary>
+        /// Calculates a planet's preference score (0.0-1.0) based on its category 
+        /// and the NN's learned preferences.
+        /// </summary>
         private double ComputePlanetScore(Planet_View p, Layer4_User_NN_Object prefs)
         {
             string cat = p.Planet.Type;
+            // Match the planet's type to the NN-derived preference value
             double pref = cat switch
             {
                 "Dwarf Planet" => prefs.DwarfPlanet,
@@ -57,9 +79,14 @@ namespace Poppy_Universe_Engine
             return Normalize(pref);
         }
 
+        /// <summary>
+        /// Calculates a moon's preference score (0.0-1.0) based on its parent planet 
+        /// and the NN's learned preferences.
+        /// </summary>
         private double ComputeMoonScore(Moon_View m, Layer4_User_NN_Object prefs)
         {
             string parent = m.Parent;
+            // Match the moon's parent planet to the NN-derived preference value
             double pref = parent switch
             {
                 "Earth" => prefs.Earth,
@@ -77,6 +104,13 @@ namespace Poppy_Universe_Engine
             return Normalize(pref);
         }
 
+        /// <summary>
+        /// Generic method to apply the Neural Network Prediction boost.
+        /// </summary>
+        /// <typeparam name="T">The type of the astronomical object (Star_View, Planet_View, etc.).</typeparam>
+        /// <param name="layerObjects">Input list of objects (results from L3 or previous layers).</param>
+        /// <param name="prefs">The user's NN preference predictions.</param>
+        /// <param name="getPreviousScore">Delegate to get the score from the previous layer.</param>
         public List<T> BoostScores<T>(
             List<T> layerObjects, // Input from Layer 3 (or Layer 2 if Layer 3 is skipped)
             Layer4_User_NN_Object prefs,
@@ -104,8 +138,7 @@ namespace Poppy_Universe_Engine
 
                 if (matchPct > 0 && score > 0)
                 {
-                    // This calculation is the source of the precision issue, 
-                    // as it uses existing rounded scores/percentages to determine the new max.
+                    // Reverse-calculate the max possible score
                     double calculatedMax = score / (matchPct / 100.0);
                     if (calculatedMax > maxPossibleScore)
                     {
@@ -116,38 +149,41 @@ namespace Poppy_Universe_Engine
 
             if (maxPossibleScore <= 0) maxPossibleScore = 100;
 
+            // Define the maximum possible boost value
             double maxBoostAllowed = maxPossibleScore * MAX_BOOST_RATIO;
 
             foreach (var obj in currentLayerObjects)
             {
                 double baseScore = getPreviousScore(obj);
-                double prefScore = getPreferenceScore(obj);
+                double prefScore = getPreferenceScore(obj); // Normalized preference score (0.0-1.0)
 
-                // NN-based boost: more aggressive since predictions are learned patterns
-                // Apply non-linear boost to emphasize strong preferences
+                // Apply non-linear boost to emphasize strong preferences predicted by the NN
                 double normalizedPref = Math.Pow(prefScore, 1.2); // Slightly exponential boost
                 double boostValue = maxBoostAllowed * normalizedPref;
 
-                // Weighted combination favoring NN predictions more
+                // Weighted combination favoring NN predictions more than previous layers
+                // The original logic `(baseScore * BASE_WEIGHT) + (baseScore * PREF_WEIGHT)` simplifies to `baseScore`
+                // as BASE_WEIGHT (0.3) + PREF_WEIGHT (0.7) = 1.0.
+                // The boostedScore calculation is effectively: boostedScore = baseScore + boostValue
                 double boostedScore = (baseScore * BASE_WEIGHT) + (baseScore * PREF_WEIGHT) + boostValue;
 
-                // Cap to max allowed for this object
+                // Cap 1: Ensure the score doesn't exceed the max allowed ratio
                 double maxAllowedForThisObject = baseScore + maxBoostAllowed;
                 if (boostedScore > maxAllowedForThisObject)
                     boostedScore = maxAllowedForThisObject;
 
-                // Global cap: Ensures score doesn't exceed the theoretical maximum
+                // Cap 2: Global cap against the theoretical maximum
                 if (boostedScore > maxPossibleScore)
                     boostedScore = maxPossibleScore;
 
-                // Round the final score (this is where the numerator gets rounded up)
+                // Round the final score
                 boostedScore = Math.Round(boostedScore, 2);
                 setFinalScore(obj, boostedScore);
 
-                // Calculate percentage using the rounded score (numerator) and unrounded max (denominator).
+                // Calculate and set the new match percentage
                 double newMatchPercentage = Math.Round((boostedScore / maxPossibleScore) * 100.0, 2);
-                
-                // FIX: Explicitly cap the displayed percentage to prevent floating-point overflow
+
+                // Explicitly cap the displayed percentage
                 if (newMatchPercentage > 100.00)
                     newMatchPercentage = 100.00;
 
@@ -160,6 +196,7 @@ namespace Poppy_Universe_Engine
                     : "No NN boost";
             }
 
+            // Filter, sort by boosted score, then by previous score (tie-breaker), and take top N
             return currentLayerObjects
                 .Where(obj => getFinalScore(obj) > 0)
                 .OrderByDescending(obj => getFinalScore(obj))
@@ -168,6 +205,9 @@ namespace Poppy_Universe_Engine
                 .ToList();
         }
 
+        /// <summary>
+        /// Coordinates the Layer 4 Neural Network boosting process for all object types.
+        /// </summary>
         public Layer4_Boost_Result BoostAll(
             List<Star_View> stars,
             List<Planet_View> planets,
@@ -182,6 +222,9 @@ namespace Poppy_Universe_Engine
             planets ??= new List<Planet_View>();
             moons ??= new List<Moon_View>();
 
+            // The 'getPreviousScore' delegates retrieve the score from the previous layer (L3 or L2).
+
+            // --- Boost Stars ---
             var boostedStars = BoostScores(
                 stars,
                 prefs,
@@ -194,6 +237,7 @@ namespace Poppy_Universe_Engine
                 topPerType
             );
 
+            // --- Boost Planets ---
             var boostedPlanets = BoostScores(
                 planets,
                 prefs,
@@ -206,6 +250,7 @@ namespace Poppy_Universe_Engine
                 topPerType
             );
 
+            // --- Boost Moons ---
             var boostedMoons = BoostScores(
                 moons,
                 prefs,
@@ -227,6 +272,11 @@ namespace Poppy_Universe_Engine
             };
         }
 
+        /// <summary>
+        /// Combines the top recommended objects from all three categories into a single, 
+        /// globally ranked list based on the final boosted score, favoring diversity in the final rank.
+        /// </summary>
+        /// <returns>A list of the top N objects, regardless of type, sorted by final score.</returns>
         public List<object> GetCombinedTopResults(
             List<Star_View> stars,
             List<Planet_View> planets,
@@ -234,6 +284,7 @@ namespace Poppy_Universe_Engine
             int topN = 15
         )
         {
+            // Tuple: (object, score, type string)
             var combined = new List<(object obj, double score, string type)>();
 
             if (stars != null)
@@ -245,17 +296,20 @@ namespace Poppy_Universe_Engine
             if (moons != null)
                 combined.AddRange(moons.Select(m => ((object)m, m.Score, "moon")));
 
-            // Enhanced sorting: primary by score, secondary by diversity
-            // This ensures we get a good mix of types in top results
+            // Enhanced sorting: primary by score, secondary by type (for consistent tie-breaking/diversity)
             return combined
                 .OrderByDescending(x => x.score)
-                .ThenBy(x => x.type) // Adds slight diversity preference
+                .ThenBy(x => x.type) // Used as a simple tie-breaker / diversity mechanism
                 .Take(topN)
                 .Select(x => x.obj)
                 .ToList();
         }
 
-        // Additional helper method for NN confidence scoring
+        /// <summary>
+        /// Calculates the overall confidence/distinction of the NN's predictions 
+        /// by analyzing the standard deviation of its preference matrix values.
+        /// </summary>
+        /// <returns>A normalized confidence value (0.0 to 1.0).</returns>
         public double CalculateNNConfidence(Layer4_User_NN_Object prefs)
         {
             // Calculate average prediction strength across all categories
@@ -272,11 +326,13 @@ namespace Poppy_Universe_Engine
             };
 
             double avgStrength = allPrefs.Average();
+            // Variance and Standard Deviation (measures how spread out the predictions are)
             double variance = allPrefs.Select(p => Math.Pow(p - avgStrength, 2)).Average();
             double stdDev = Math.Sqrt(variance);
 
-            // Higher standard deviation = more distinct preferences = higher confidence
-            // Normalized to 0-1 range
+            // Higher standard deviation means the NN has more distinct (less flat) preferences, 
+            // implying higher confidence in its specific predictions.
+            // Normalized to a 0-1 range (assuming max stdDev is around 2.0 based on 0-10 input)
             return Math.Min(1.0, stdDev / 2.0);
         }
     }

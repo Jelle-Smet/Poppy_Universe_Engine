@@ -3,27 +3,37 @@
 namespace Poppy_Universe_Engine
 {
     /// <summary>
-    /// More accurate planetary position calculations using VSOP87-style formulas
-    /// These use time-varying orbital elements for better accuracy
+    /// Service for calculating the heliocentric (Sun-centered) position of planets 
+    /// and major solar system bodies (including Dwarf Planets) using simplified time-varying 
+    /// orbital elements (similar to VSOP87) for accuracy.
     /// </summary>
     public class Planetary_Position_Service
     {
-        // Orbital elements at J2000.0 epoch with century rates
+        /// <summary>
+        /// Data structure to hold the orbital elements and their secular (century) rates of change.
+        /// </summary>
         private class OrbitalElements
         {
-            public double a, a_cy;      // Semi-major axis (AU) and century rate
-            public double e, e_cy;      // Eccentricity and century rate
-            public double I, I_cy;      // Inclination (deg) and century rate
-            public double L, L_cy;      // Mean longitude (deg) and century rate
-            public double w_bar, w_bar_cy; // Longitude of perihelion (deg) and century rate
-            public double Omega, Omega_cy; // Longitude of ascending node (deg) and century rate
+            // Orbital Element (a, e, I, L, ω̄, Ω) and its rate of change per Julian Century (cy)
+            public double a, a_cy;      // Semi-major axis (a, in AU)
+            public double e, e_cy;      // Eccentricity (e, dimensionless)
+            public double I, I_cy;      // Inclination (I, in degrees)
+            public double L, L_cy;      // Mean longitude (L, in degrees)
+            public double w_bar, w_bar_cy; // Longitude of perihelion (ω̄ = ω + Ω, in degrees)
+            public double Omega, Omega_cy; // Longitude of ascending node (Ω, in degrees)
         }
 
+        /// <summary>
+        /// Retrieves the J2000.0 orbital elements and their century rates for a given planet/dwarf planet.
+        /// Elements added for: Pluto, Ceres, Eris, Haumea, and Makemake.
+        /// </summary>
+        /// <exception cref="ArgumentException">Thrown if the planet name is not supported.</exception>
         private static OrbitalElements GetPlanetElements(string planetName)
         {
-            // Source: NASA JPL Planetary Ephemerides
+            // Source: Data compiled from various astronomical sources (e.g., NASA JPL, Minor Planet Center)
             switch (planetName.ToLower())
             {
+                // Major Planets (unchanged)
                 case "mercury":
                     return new OrbitalElements
                     {
@@ -152,67 +162,164 @@ namespace Poppy_Universe_Engine
                         Omega = 131.78422574,
                         Omega_cy = -0.00508664
                     };
+
+                // -----------------------------------------------------------
+                // Dwarf Planets (New Additions)
+                // -----------------------------------------------------------
+                case "ceres":
+                    return new OrbitalElements
+                    {
+                        a = 2.766,
+                        a_cy = 0.0,
+                        e = 0.078,
+                        e_cy = 0.0,
+                        I = 10.59,
+                        I_cy = 0.0,
+                        L = 92.5,
+                        L_cy = 43258.9,
+                        w_bar = 73.6,
+                        w_bar_cy = 0.0,
+                        Omega = 80.5,
+                        Omega_cy = 0.0
+                    };
+                case "pluto":
+                    return new OrbitalElements
+                    {
+                        a = 39.482,
+                        a_cy = 0.0,
+                        e = 0.2488,
+                        e_cy = 0.0,
+                        I = 17.14,
+                        I_cy = 0.0,
+                        L = 238.9,
+                        L_cy = 1.45,
+                        w_bar = 224.1,
+                        w_bar_cy = 0.0,
+                        Omega = 110.3,
+                        Omega_cy = 0.0
+                    };
+                case "eris":
+                    return new OrbitalElements
+                    {
+                        a = 67.8,
+                        a_cy = 0.0,
+                        e = 0.437,
+                        e_cy = 0.0,
+                        I = 44.0,
+                        I_cy = 0.0,
+                        L = 197.8,
+                        L_cy = 0.39,
+                        w_bar = 320.1,
+                        w_bar_cy = 0.0,
+                        Omega = 35.8,
+                        Omega_cy = 0.0
+                    };
+                case "haumea":
+                    return new OrbitalElements
+                    {
+                        a = 43.1,
+                        a_cy = 0.0,
+                        e = 0.188,
+                        e_cy = 0.0,
+                        I = 28.2,
+                        I_cy = 0.0,
+                        L = 216.9,
+                        L_cy = 0.54,
+                        w_bar = 240.5,
+                        w_bar_cy = 0.0,
+                        Omega = 121.2,
+                        Omega_cy = 0.0
+                    };
+                case "makemake":
+                    return new OrbitalElements
+                    {
+                        a = 45.8,
+                        a_cy = 0.0,
+                        e = 0.160,
+                        e_cy = 0.0,
+                        I = 28.9,
+                        I_cy = 0.0,
+                        L = 351.4,
+                        L_cy = 0.49,
+                        w_bar = 295.1,
+                        w_bar_cy = 0.0,
+                        Omega = 79.5,
+                        Omega_cy = 0.0
+                    };
+
                 default:
-                    throw new ArgumentException($"Unknown planet: {planetName}");
+                    throw new ArgumentException($"Unknown planet or dwarf planet: {planetName}");
             }
         }
 
+        /// <summary>
+        /// Calculates the heliocentric position (X, Y, Z) of a celestial body in rectangular ecliptic coordinates (AU).
+        /// </summary>
+        /// <param name="planetName">The name of the body.</param>
+        /// <param name="utcTime">The observation time in UTC.</param>
+        /// <returns>A tuple containing (X, Y, Z) coordinates in AU, referenced to the J2000.0 ecliptic plane.</returns>
         public static (double X, double Y, double Z) CalculateHeliocentricPosition(string planetName, DateTime utcTime)
         {
+            // 1. Calculate time difference from epoch (J2000.0)
             double jd = ToJulianDate(utcTime);
-            double T = (jd - 2451545.0) / 36525.0; // Julian centuries from J2000.0
+            double T = (jd - 2451545.0) / 36525.0; // Julian centuries from J2000.0 epoch
 
             var elem = GetPlanetElements(planetName);
 
-            // Compute current orbital elements
-            double a = elem.a + elem.a_cy * T;
-            double e = elem.e + elem.e_cy * T;
-            double I = (elem.I + elem.I_cy * T) * Math.PI / 180.0;
-            double L = (elem.L + elem.L_cy * T) % 360.0;
+            // 2. Compute current time-dependent orbital elements
+            double a = elem.a + elem.a_cy * T; // Semi-major axis
+            double e = elem.e + elem.e_cy * T; // Eccentricity
+            double I = (elem.I + elem.I_cy * T) * Math.PI / 180.0; // Inclination (converted to radians)
+
+            double L = (elem.L + elem.L_cy * T) % 360.0; // Mean longitude
             if (L < 0) L += 360.0;
-            double w_bar = (elem.w_bar + elem.w_bar_cy * T) % 360.0;
+
+            double w_bar = (elem.w_bar + elem.w_bar_cy * T) % 360.0; // Longitude of perihelion
             if (w_bar < 0) w_bar += 360.0;
-            double Omega = (elem.Omega + elem.Omega_cy * T) % 360.0;
+
+            double Omega = (elem.Omega + elem.Omega_cy * T) % 360.0; // Longitude of ascending node
             if (Omega < 0) Omega += 360.0;
 
-            // Calculate argument of perihelion and mean anomaly
-            double w = w_bar - Omega; // argument of perihelion
-            double M = L - w_bar;     // mean anomaly
+            // 3. Calculate argument of perihelion (ω) and Mean Anomaly (M)
+            double w = w_bar - Omega;      // argument of perihelion (ω = ω̄ - Ω)
+            double M = L - w_bar;          // mean anomaly (M = L - ω̄)
             if (M < 0) M += 360.0;
 
-            // Convert to radians
+            // 4. Convert angular measures to radians
             double M_rad = M * Math.PI / 180.0;
             double w_rad = w * Math.PI / 180.0;
             double Omega_rad = Omega * Math.PI / 180.0;
 
-            // Solve Kepler's equation
+            // 5. Solve Kepler's equation to find the Eccentric Anomaly (E)
             double E = SolveKeplerEquation(M_rad, e);
 
-            // True anomaly
+            // 6. Calculate True Anomaly (ν) and Heliocentric Distance (r)
             double nu = 2 * Math.Atan2(
                 Math.Sqrt(1 + e) * Math.Sin(E / 2),
                 Math.Sqrt(1 - e) * Math.Cos(E / 2)
             );
+            double r = a * (1 - e * Math.Cos(E)); // Heliocentric distance (r) in AU
 
-            // Heliocentric distance
-            double r = a * (1 - e * Math.Cos(E));
-
-            // Position in orbital plane
+            // 7. Calculate position in the orbital plane
             double x_orb = r * Math.Cos(nu);
             double y_orb = r * Math.Sin(nu);
 
-            // Rotate to ecliptic coordinates
+            // 8. Rotate position to J2000.0 rectangular ecliptic coordinates (X, Y, Z)
             double x_ecl = (Math.Cos(w_rad) * Math.Cos(Omega_rad) - Math.Sin(w_rad) * Math.Sin(Omega_rad) * Math.Cos(I)) * x_orb +
-                          (-Math.Sin(w_rad) * Math.Cos(Omega_rad) - Math.Cos(w_rad) * Math.Sin(Omega_rad) * Math.Cos(I)) * y_orb;
+                           (-Math.Sin(w_rad) * Math.Cos(Omega_rad) - Math.Cos(w_rad) * Math.Sin(Omega_rad) * Math.Cos(I)) * y_orb;
 
             double y_ecl = (Math.Cos(w_rad) * Math.Sin(Omega_rad) + Math.Sin(w_rad) * Math.Cos(Omega_rad) * Math.Cos(I)) * x_orb +
-                          (-Math.Sin(w_rad) * Math.Sin(Omega_rad) + Math.Cos(w_rad) * Math.Cos(Omega_rad) * Math.Cos(I)) * y_orb;
+                           (-Math.Sin(w_rad) * Math.Sin(Omega_rad) + Math.Cos(w_rad) * Math.Cos(Omega_rad) * Math.Cos(I)) * y_orb;
 
             double z_ecl = Math.Sin(w_rad) * Math.Sin(I) * x_orb + Math.Cos(w_rad) * Math.Sin(I) * y_orb;
 
             return (x_ecl, y_ecl, z_ecl);
         }
 
+        /// <summary>
+        /// Solves Kepler's equation ($M = E - e \cdot \sin(E)$) for the Eccentric Anomaly (E)
+        /// using the iterative Newton-Raphson method.
+        /// </summary>
         private static double SolveKeplerEquation(double M, double e, double tolerance = 1e-8)
         {
             double E = M;
@@ -226,29 +333,41 @@ namespace Poppy_Universe_Engine
             return E;
         }
 
+        /// <summary>
+        /// Converts rectangular ecliptic coordinates (X, Y, Z) to spherical equatorial coordinates 
+        /// (Right Ascension (RA) and Declination (Dec)).
+        /// </summary>
+        /// <returns>A tuple containing (RA in degrees, Dec in degrees).</returns>
         public static (double RA, double Dec) ConvertToEquatorial(double x, double y, double z)
         {
+            // J2000.0 obliquity of the ecliptic
             double obliquity = 23.43928 * Math.PI / 180.0;
 
+            // Rotation of coordinates from Ecliptic plane to Equatorial plane
             double x_eq = x;
             double y_eq = y * Math.Cos(obliquity) - z * Math.Sin(obliquity);
             double z_eq = y * Math.Sin(obliquity) + z * Math.Cos(obliquity);
 
+            // Calculate Right Ascension (RA)
             double ra = Math.Atan2(y_eq, x_eq) * 180.0 / Math.PI;
             if (ra < 0) ra += 360.0;
 
+            // Calculate Declination (Dec)
             double distance = Math.Sqrt(x_eq * x_eq + y_eq * y_eq + z_eq * z_eq);
             double dec = Math.Asin(z_eq / distance) * 180.0 / Math.PI;
 
             return (ra, dec);
         }
 
+        /// <summary>
+        /// Converts a UTC DateTime object to a Julian Date (JD).
+        /// </summary>
         private static double ToJulianDate(DateTime utcTime)
         {
             int year = utcTime.Year;
             int month = utcTime.Month;
             double day = utcTime.Day + utcTime.Hour / 24.0 +
-                        utcTime.Minute / 1440.0 + utcTime.Second / 86400.0;
+                         utcTime.Minute / 1440.0 + utcTime.Second / 86400.0;
 
             if (month <= 2)
             {
@@ -260,8 +379,8 @@ namespace Poppy_Universe_Engine
             int B = 2 - A + (A / 4);
 
             double jd = Math.Floor(365.25 * (year + 4716)) +
-                       Math.Floor(30.6001 * (month + 1)) +
-                       day + B - 1524.5;
+                        Math.Floor(30.6001 * (month + 1)) +
+                        day + B - 1524.5;
 
             return jd;
         }

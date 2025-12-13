@@ -3,12 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|c:\\users\\jelle\\onedrive - thomas more\\school\\phase_3\\semester_1\\special_project\\poppy_universe\\recommendation_engine\\poppy_universe_engine\\layer3_poppys_matrix_booster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|solutionrelative:layer3_poppys_matrix_booster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|c:\\users\\jelle\\onedrive - thomas more\\school\\phase_3\\semester_1\\special_project\\poppy_universe\\recommendation_engine\\poppy_universe_engine\\layer4_poppys_nn_booster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|solutionrelative:layer4_poppys_nn_booster.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|c:\\users\\jelle\\onedrive - thomas more\\school\\phase_3\\semester_1\\special_project\\poppy_universe\\recommendation_engine\\poppy_universe_engine\\layer1_moon_engine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|solutionrelative:layer1_moon_engine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|c:\\users\\jelle\\onedrive - thomas more\\school\\phase_3\\semester_1\\special_project\\poppy_universe\\recommendation_engine\\poppy_universe_engine\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -22,19 +18,19 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Layer4_Poppys_NN_Booster.cs",
-              "DocumentMoniker": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Layer4_Poppys_NN_Booster.cs",
-              "RelativeDocumentMoniker": "Layer4_Poppys_NN_Booster.cs",
-              "ToolTip": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Layer4_Poppys_NN_Booster.cs",
-              "RelativeToolTip": "Layer4_Poppys_NN_Booster.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAABSAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "Layer1_Moon_Engine.cs",
+              "DocumentMoniker": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Layer1_Moon_Engine.cs",
+              "RelativeDocumentMoniker": "Layer1_Moon_Engine.cs",
+              "ToolTip": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Layer1_Moon_Engine.cs",
+              "RelativeToolTip": "Layer1_Moon_Engine.cs",
+              "ViewState": "AgIAAEQBAAAAAAAAAAAmwFQBAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-09T15:12:14.106Z",
+              "WhenOpened": "2025-12-13T15:36:31.789Z",
               "EditorCaption": ""
             },
             {
@@ -43,26 +39,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Layer3_Poppys_Matrix_Booster.cs",
-              "DocumentMoniker": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Layer3_Poppys_Matrix_Booster.cs",
-              "RelativeDocumentMoniker": "Layer3_Poppys_Matrix_Booster.cs",
-              "ToolTip": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Layer3_Poppys_Matrix_Booster.cs",
-              "RelativeToolTip": "Layer3_Poppys_Matrix_Booster.cs",
-              "ViewState": "AgIAAOcAAAAAAAAAAAAAAP8AAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-12-09T15:05:02.713Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAMoAAAAAAAAAAAAgwH4AAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAD4CAAAAAAAAAAAowDoCAABJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-09T13:47:58.43Z",
               "EditorCaption": ""

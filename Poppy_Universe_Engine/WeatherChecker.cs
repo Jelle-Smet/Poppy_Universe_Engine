@@ -39,7 +39,7 @@ namespace Poppy_Universe_Engine
         /// </summary>
         public (double Chance, string Reason) ComputeWeatherChanceWithReason(
             JsonElement weatherData,
-            
+
             int cloudThreshold = 30)
         {
             var hourly = weatherData.GetProperty("hourly");
