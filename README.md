@@ -1,5 +1,5 @@
 <div style="display: flex; align-items: center; gap: 10px;">
-  <img src="../Images/Poppy_Universe_Logo.png" alt="Poppy Universe Logo" width="100" style="margin-top: -5px;"/>
+  <img src="Images/Poppy_Universe_Shield.png" alt="Poppy Universe Logo" width="100" style="margin-top: -5px;"/>
   <h1>Poppy Universe - Recommendation Engine</h1>
 </div>
 
@@ -145,8 +145,46 @@ Recommendation_Engine/
 >   - Maintains **visibility percentages** from previous layers (informational only)  
 >   - Layer 4 predictions can optionally be weighted by visibility for final presentation
 
-### 🌠 Layer xx — Future Extensions
-...
+# 🧬 Layer 5 — Genetic Algorithm Rank Fusion
+
+> Layer 5 is the **consensus-based fusion layer**. Its focus is on **intelligently combining the rankings** from all previous layers (1-4) to produce a final, optimized recommendation list that balances multiple recommendation strategies.
+>
+>- **Purpose:** Find the optimal way to combine personalized, trending, matrix factorization, and neural network recommendations into a single unified ranking that minimizes disagreement across all approaches.
+>
+>- **Inputs used:**  
+>  - Ranked lists from **Layer 1** (personalized scores)  
+>  - Ranked lists from **Layer 2** (trend-boosted scores)  
+>  - Ranked lists from **Layer 3** (matrix factorization predictions)  
+>  - Ranked lists from **Layer 4** (neural network predictions)  
+>  - Object metadata (type, brightness, visibility) from previous layers
+>
+>- **How it works:**  
+>  1. **Converts layer outputs to rank positions**: Each object gets a rank (0 = best) in each of the four layers.  
+>  2. **Genetic Algorithm optimization**: Evolves a population of weight combinations (W₁, W₂, W₃, W₄) over multiple generations to find the optimal fusion strategy.  
+>  3. **Fitness function**: Minimizes the variance between the final weighted rank and individual layer ranks, finding the ranking that best represents consensus across all layers.  
+>  4. **Independent optimization**: Runs three separate GA processes for Stars, Planets, and Moons since different object types may benefit from different layer weightings.  
+>  5. **Constraint enforcement**: All weights sum to 1.0 and remain non-negative throughout evolution.  
+>  6. **GA operators**:  
+>     - **Initialization**: Random weights normalized to sum to 1.0  
+>     - **Selection**: Tournament selection + elitism (top 15% survive)  
+>     - **Crossover**: Blended average crossover with random alpha  
+>     - **Mutation**: Gaussian perturbation with re-normalization  
+>  7. Computes **final scores** using the optimal weights: `FinalScore = W₁×Rank₁ + W₂×Rank₂ + W₃×Rank₃ + W₄×Rank₄`
+>
+>- **Returns:**  
+>  - **Three final ranked lists** (Stars, Planets, Moons), each sorted by optimized consensus score  
+>  - **Optimal weight combinations** for each object type showing which layers contributed most  
+>  - Each object includes its **rank in all 4 layers** for transparency and debugging
+>
+>- **Visibility info:**  
+>  - Inherits **visibility percentages** and explanations from Layer 1 (informational only)  
+>  - Final rankings can be filtered or sorted by visibility for real-time observation planning
+>
+>- **Why GA over simple averaging?**  
+>  - Different layers may be more reliable for different object types (e.g., trending might work better for bright planets, personalization for faint stars)  
+>  - GA automatically discovers the optimal balance without manual tuning  
+>  - Minimizing disagreement creates rankings that are robust and well-supported by multiple algorithms  
+>  - Adapts to data: if one layer has poor quality rankings, GA naturally downweights it
 
 ---
 
@@ -177,8 +215,7 @@ Each recommendation includes **visibility information**:
 
 ## 🌟 Future Plans
 
-* Add **Business Logic** (Layer 5).
-* Fully integrate with backend, frontend, and ML modules.
+* Fully integrate with **backend, frontend, and ML modules**.
 * Turn this into the **complete Poppy Universe project repo**, containing engine, frontend, backend, data, and ML.
 
 ---
@@ -190,5 +227,5 @@ Each recommendation includes **visibility information**:
 
 
 <p align="center">
-  <img src="../Images/Poppy_Universe_Logo.png" alt="Poppy Universe Logo" width="600"/>
+  <img src="Images/Poppy_Universe_Logo.png" alt="Poppy Universe Logo" width="600"/>
 </p>
