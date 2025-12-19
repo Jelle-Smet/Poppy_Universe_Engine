@@ -97,30 +97,32 @@ namespace Poppy_Universe_Engine
             double daysSinceEpoch = jd - 2451545.0; // J2000.0 epoch
 
             // --- Step 2: Convert Orbital Elements to Radians/AU ---
-            double a = moon.SemiMajorAxisKm / 149597870.7; // Convert Semi-Major Axis from km to AU
-            double e = moon.Eccentricity;
-            double i = moon.Inclination * Math.PI / 180.0; // Inclination
-            double omega = moon.ArgumentOfPeriapsis * Math.PI / 180.0; // Argument of Periapsis
-            double Omega = moon.LongitudeOfAscendingNode * Math.PI / 180.0; // Longitude of Ascending Node
-            double M0 = moon.MeanAnomalyAtEpoch * Math.PI / 180.0; // Mean Anomaly at Epoch
+
+            // Use ?? 0 for every property to ensure the math has a number to work with
+            double a = (moon.SemiMajorAxisKm ?? 0) / 149597870.7;
+            double e = moon.Eccentricity ?? 0;
+            double i = (moon.Inclination ?? 0) * Math.PI / 180.0;
+            double omega = (moon.ArgumentOfPeriapsis ?? 0) * Math.PI / 180.0;
+            double Omega = (moon.LongitudeOfAscendingNode ?? 0) * Math.PI / 180.0;
+            double M0 = (moon.MeanAnomalyAtEpoch ?? 0) * Math.PI / 180.0;
 
             // --- Step 3: Calculate Mean Motion (n) ---
             double n;
             if (moon.MeanMotion > 0)
             {
-                // Use provided Mean Motion
-                n = moon.MeanMotion * Math.PI / 180.0;
+                // If MeanMotion is null, we default to 0.0
+                n = (moon.MeanMotion ?? 0.0) * Math.PI / 180.0;
             }
             else if (moon.OrbitalPeriod > 0)
             {
                 // Calculate n from Orbital Period (n = 2π / P)
-                n = (2 * Math.PI) / moon.OrbitalPeriod;
+                n = (2 * Math.PI) / (moon.OrbitalPeriod ?? 0.0);
             }
             else
             {
                 // Fallback: Estimate n using a rough approximation based on Kepler's third law 
                 // and a ratio against the Earth-Moon system.
-                double periodDays = Math.Sqrt(Math.Pow(moon.SemiMajorAxisKm / 384400.0, 3)) * 27.3;
+                double periodDays = Math.Sqrt(Math.Pow((moon.SemiMajorAxisKm ?? 0.0) / 384400.0, 3)) * 27.3;
                 n = (2 * Math.PI) / periodDays;
             }
 
@@ -298,7 +300,7 @@ namespace Poppy_Universe_Engine
                 if (m.Moon.DistanceFromEarth > 0)
                 {
                     // Inverse power relationship, capped at 3
-                    distanceScore = Math.Min(3, Math.Pow(1_000.0 / (m.Moon.DistanceFromEarth + 1.0), 1.2));
+                    distanceScore = Math.Min(3, Math.Pow(1_000.0 / ((m.Moon.DistanceFromEarth ?? 0.0) + 1.0), 1.2));
                 }
 
                 // 5) Magnitude (non-linear): Scores higher for brighter moons (lower magnitude value, max 2 points).
@@ -306,7 +308,7 @@ namespace Poppy_Universe_Engine
                 if (m.Moon.Magnitude > 0)
                 {
                     // Inverse relationship (smaller magnitude = brighter = higher score), capped at 2
-                    magScore = Math.Max(0, Math.Min(2, Math.Pow(2 - (m.Moon.Magnitude / 10.0), 1.2)));
+                    magScore = Math.Max(0, Math.Min(2, Math.Pow(2 - ((m.Moon.Magnitude ?? 0.0) / 10.0), 1.2)));
                 }
 
                 // 6) Synergy bonus: 1 extra point if the user likes both the moon AND its parent planet.

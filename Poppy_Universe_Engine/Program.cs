@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace Poppy_Universe_Engine
 {
@@ -9,104 +11,42 @@ namespace Poppy_Universe_Engine
         static void Main(string[] args)
         {
             // ═══════════════════════════════════════════════════════════════
-            // STEP 1: Initialize Celestial Objects Data (Simulated Database)
-            // This data feeds into the Layer 1 visibility and scoring engines.
+            // STEP 1: Catch Data from Node.js (Replaces Hardcoded Data)
             // ═══════════════════════════════════════════════════════════════
 
-            List<Star_Objects> Stars = new List<Star_Objects>
-            {
-                // Star_Objects: RA_ICRS and DE_ICRS define the fixed position in the sky.
-                // Gmag (magnitude) and SpectralType are key inputs for Layer 1 scoring.
-                new Star_Objects { Id = 1, Name = "Sirius", Source = 1, RA_ICRS = 6.752, DE_ICRS = -16.716, Gmag = -1.46, SpectralType = "A" },
-                new Star_Objects { Id = 2, Name = "Betelgeuse", Source = 2, RA_ICRS = 5.9195, DE_ICRS = 7.4071, Gmag = 0.42, SpectralType = "M" },
-                new Star_Objects { Id = 3, Name = "Rigel", Source = 3, RA_ICRS = 5.242, DE_ICRS = -8.201, Gmag = 0.18, SpectralType = "B" },
-                new Star_Objects { Id = 4, Name = "Procyon", Source = 4, RA_ICRS = 7.655, DE_ICRS = 5.225, Gmag = 0.38, SpectralType = "F" },
-                new Star_Objects { Id = 5, Name = "Achernar", Source = 5, RA_ICRS = 1.6286, DE_ICRS = -57.2368, Gmag = 0.46, SpectralType = "B" },
-                new Star_Objects { Id = 6, Name = "Altair", Source = 6, RA_ICRS = 19.8464, DE_ICRS = 8.8683, Gmag = 0.77, SpectralType = "A" },
-                new Star_Objects { Id = 7, Name = "Aldebaran", Source = 7, RA_ICRS = 4.5987, DE_ICRS = 16.5093, Gmag = 0.87, SpectralType = "K" },
-                new Star_Objects { Id = 8, Name = "Spica", Source = 8, RA_ICRS = 13.4199, DE_ICRS = -11.1614, Gmag = 0.97, SpectralType = "B" },
-                new Star_Objects { Id = 9, Name = "Antares", Source = 9, RA_ICRS = 16.4901, DE_ICRS = -26.4319, Gmag = 1.06, SpectralType = "M" },
-                new Star_Objects { Id = 10, Name = "Pollux", Source = 10, RA_ICRS = 7.7553, DE_ICRS = 28.0262, Gmag = 1.14, SpectralType = "K" },
-                new Star_Objects { Id = 11, Name = "Fomalhaut", Source = 11, RA_ICRS = 22.9608, DE_ICRS = -29.6222, Gmag = 1.16, SpectralType = "A" },
-                new Star_Objects { Id = 12, Name = "Deneb", Source = 12, RA_ICRS = 20.6905, DE_ICRS = 45.2803, Gmag = 1.25, SpectralType = "A" },
-                new Star_Objects { Id = 13, Name = "Regulus", Source = 13, RA_ICRS = 10.1395, DE_ICRS = 11.9672, Gmag = 1.35, SpectralType = "B" },
-                new Star_Objects { Id = 14, Name = "Castor", Source = 14, RA_ICRS = 7.5767, DE_ICRS = 31.8883, Gmag = 1.58, SpectralType = "A" },
-                new Star_Objects { Id = 15, Name = "Adhara", Source = 15, RA_ICRS = 6.9771, DE_ICRS = -28.9721, Gmag = 1.50, SpectralType = "B" },
-                new Star_Objects { Id = 16, Name = "Shaula", Source = 16, RA_ICRS = 17.5601, DE_ICRS = -37.1038, Gmag = 1.62, SpectralType = "B" },
-                new Star_Objects { Id = 17, Name = "Bellatrix", Source = 17, RA_ICRS = 5.4189, DE_ICRS = 6.3497, Gmag = 1.64, SpectralType = "B" },
-                new Star_Objects { Id = 18, Name = "Elnath", Source = 18, RA_ICRS = 5.4382, DE_ICRS = 28.6075, Gmag = 1.65, SpectralType = "B" },
-                new Star_Objects { Id = 19, Name = "Miaplacidus", Source = 19, RA_ICRS = 9.2190, DE_ICRS = -69.7172, Gmag = 1.67, SpectralType = "A" },
-                new Star_Objects { Id = 20, Name = "Alnilam", Source = 20, RA_ICRS = 5.6036, DE_ICRS = -1.2019, Gmag = 1.69, SpectralType = "B" },
+            // Read the JSON string
+            string jsonInput = Console.In.ReadToEnd();
 
+            // ✨ ADD THIS: Configure the options to allow strings for numbers
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString
             };
 
-            List<Planet_Objects> Planets = new List<Planet_Objects>
-            {
-                // Planet_Objects: Contains physical properties and orbital elements (like SemiMajorAxisAU)
-                // The "Type" field is important for Layer 3/4 boosting.
-                new Planet_Objects { Id = 1, Name = "Sun", Magnitude = 4.83, Color="Yellow-White", DistanceFromSun=0, DistanceFromEarth=149.6, Diameter=1391016, Mass=1989000, OrbitalPeriod=0, OrbitalInclination=0, SemiMajorAxisAU=0, LongitudeAscendingNode=0, ArgumentPeriapsis=0, MeanAnomaly=0, MeanTemperature=5505, NumberOfMoons=0, HasRings=false, HasMagneticField=true, Type="Star" },
-                new Planet_Objects { Id = 2, Name = "Mercury", Magnitude = 5.73, Color="Gray", DistanceFromSun=57.9, DistanceFromEarth=91.7, Diameter=4879, Mass=0.330, OrbitalPeriod=88, OrbitalInclination=7.0, SemiMajorAxisAU=0.387, LongitudeAscendingNode=48.331, ArgumentPeriapsis=29.124, MeanAnomaly=174.796, MeanTemperature=167, NumberOfMoons=0, HasRings=false, HasMagneticField=true, Type="Terrestrial" },
-                new Planet_Objects { Id = 3, Name = "Venus", Magnitude = 4.38, Color="Yellow", DistanceFromSun=108.2, DistanceFromEarth=41.4, Diameter=12104, Mass=4.87, OrbitalPeriod=225, OrbitalInclination=3.39, SemiMajorAxisAU=0.723, LongitudeAscendingNode=76.680, ArgumentPeriapsis=54.884, MeanAnomaly=50.115, MeanTemperature=464, NumberOfMoons=0, HasRings=false, HasMagneticField=false, Type="Terrestrial" },
-                new Planet_Objects { Id = 4, Name = "Earth", Magnitude = 4.83, Color="Blue", DistanceFromSun=149.6, DistanceFromEarth=83.0, Diameter=12742, Mass=5.97, OrbitalPeriod=365, OrbitalInclination=0.0, SemiMajorAxisAU=1.0, LongitudeAscendingNode=0, ArgumentPeriapsis=102.947, MeanAnomaly=100.464, MeanTemperature=15, NumberOfMoons=1, HasRings=false, HasMagneticField=true, Type="Terrestrial" },
-                new Planet_Objects { Id = 5, Name = "Mars", Magnitude = 6.40, Color="Red", DistanceFromSun=227.9, DistanceFromEarth=78.3, Diameter=6792, Mass=0.642, OrbitalPeriod=687, OrbitalInclination=1.85, SemiMajorAxisAU=1.524, LongitudeAscendingNode=49.558, ArgumentPeriapsis=286.502, MeanAnomaly=19.41, MeanTemperature=-60, NumberOfMoons=2, HasRings=false, HasMagneticField=false, Type="Terrestrial" },
-                new Planet_Objects { Id = 6, Name = "Jupiter", Magnitude = 2.70, Color="Orange", DistanceFromSun=778.5, DistanceFromEarth=628.7, Diameter=139820, Mass=1898, OrbitalPeriod=4333, OrbitalInclination=1.31, SemiMajorAxisAU=5.203, LongitudeAscendingNode=100.464, ArgumentPeriapsis=273.867, MeanAnomaly=20.020, MeanTemperature=-110, NumberOfMoons=79, HasRings=true, HasMagneticField=true, Type="Gas Giant" },
-                new Planet_Objects { Id = 7, Name = "Saturn", Magnitude = 1.47, Color="Yellow", DistanceFromSun=1427, DistanceFromEarth=1275, Diameter=120536, Mass=568, OrbitalPeriod=10759, OrbitalInclination=2.49, SemiMajorAxisAU=9.537, LongitudeAscendingNode=113.665, ArgumentPeriapsis=339.392, MeanAnomaly=317.020, MeanTemperature=-140, NumberOfMoons=82, HasRings=true, HasMagneticField=true, Type="Gas Giant" },
-                new Planet_Objects { Id = 8, Name = "Uranus", Magnitude = 5.52, Color="LightBlue", DistanceFromSun=2871, DistanceFromEarth=2721, Diameter=51118, Mass=86.8, OrbitalPeriod=30687, OrbitalInclination=0.77, SemiMajorAxisAU=19.191, LongitudeAscendingNode=74.006, ArgumentPeriapsis=96.998, MeanAnomaly=142.238, MeanTemperature=-195, NumberOfMoons=27, HasRings=true, HasMagneticField=true, Type="Ice Giant" },
-                new Planet_Objects { Id = 9, Name = "Neptune", Magnitude = 7.05, Color="Blue", DistanceFromSun=4495, DistanceFromEarth=4351, Diameter=49528, Mass=102, OrbitalPeriod=60190, OrbitalInclination=1.77, SemiMajorAxisAU=30.07, LongitudeAscendingNode=131.784, ArgumentPeriapsis=272.846, MeanAnomaly=256.228, MeanTemperature=-200, NumberOfMoons=14, HasRings=true, HasMagneticField=true, Type="Ice Giant" },
+            options.Converters.Add(new BoolConverter());
+            options.Converters.Add(new StringConverter());
 
-            };
+            // Use the options in your Deserialize call
+            var payload = JsonSerializer.Deserialize<PayloadWrapper>(jsonInput, options);
 
-            List<Moon_Objects> Moons = new List<Moon_Objects>
-            {
-                // Moon_Objects: Contains orbital elements relative to the parent planet (SemiMajorAxisKm, Inclination).
-                // Features and Composition are used in Layer 1 scoring.
-                // Earth's Moon
-                new Moon_Objects { Id = 1, Name="Moon", Parent="Earth", Color="Gray", Diameter=3475, Mass=0.073, OrbitalPeriod=27.3, SemiMajorAxisKm=384400, Inclination=5.145, SurfaceTemperature=-53, Composition="Rock/Ice", SurfaceFeatures="Craters", DistanceFromEarth=0 },
-
-                // Mars Moons
-                new Moon_Objects { Id = 2, Name="Phobos", Parent="Mars", Color="Gray", Diameter=22.4, Mass=1.065e-8, OrbitalPeriod=0.319, SemiMajorAxisKm=9376, Inclination=1.093, SurfaceTemperature=-40, Composition="Rock", SurfaceFeatures="Craters", DistanceFromEarth=78.4 },
-                new Moon_Objects { Id = 3, Name="Deimos", Parent="Mars", Color="Gray", Diameter=12.4, Mass=1.476e-9, OrbitalPeriod=1.263, SemiMajorAxisKm=23460, Inclination=0.93, SurfaceTemperature=-40, Composition="Rock", SurfaceFeatures="Craters", DistanceFromEarth=78.4 },
-
-                // Jupiter Moons
-                new Moon_Objects { Id = 4, Name="Io", Parent="Jupiter", Color="Yellow", Diameter=3643, Mass=0.089, OrbitalPeriod=1.769, SemiMajorAxisKm=421700, Inclination=0.04, SurfaceTemperature=-143, Composition="Rock/Ice", SurfaceFeatures="Volcanoes", DistanceFromEarth=628.5 },
-                new Moon_Objects { Id = 5, Name="Europa", Parent="Jupiter", Color="Gray", Diameter=3122, Mass=0.008, OrbitalPeriod=3.551, SemiMajorAxisKm=671000, Inclination=0.47, SurfaceTemperature=-160, Composition="Ice/Rock", SurfaceFeatures="Cracks", DistanceFromEarth=628.5 },
-                new Moon_Objects { Id = 6, Name="Ganymede", Parent="Jupiter", Color="Gray", Diameter=5268, Mass=0.148, OrbitalPeriod=7.154, SemiMajorAxisKm=1070400, Inclination=0.20, SurfaceTemperature=-160, Composition="Ice/Rock", SurfaceFeatures="Cratered terrain", DistanceFromEarth=628.5 },
-                new Moon_Objects { Id = 7, Name="Callisto", Parent="Jupiter", Color="Gray", Diameter=4821, Mass=0.107, OrbitalPeriod=16.689, SemiMajorAxisKm=1882700, Inclination=0.19, SurfaceTemperature=-139, Composition="Ice/Rock", SurfaceFeatures="Craters", DistanceFromEarth=628.5 },
-
-                // Saturn Moons
-                new Moon_Objects { Id = 8, Name="Titan", Parent="Saturn", Color="Orange", Diameter=5150, Mass=0.1345, OrbitalPeriod=15.945, SemiMajorAxisKm=1221870, Inclination=0.33, SurfaceTemperature=-179, Composition="Nitrogen/Methane", SurfaceFeatures="Lakes, dunes", DistanceFromEarth=1272 },
-                new Moon_Objects { Id = 9, Name="Enceladus", Parent="Saturn", Color="White", Diameter=504, Mass=1.08e-4, OrbitalPeriod=1.370, SemiMajorAxisKm=238000, Inclination=0.0, SurfaceTemperature=-198, Composition="Ice/Rock", SurfaceFeatures="Geysers", DistanceFromEarth=1272 },
-
-                // Uranus Moons
-                new Moon_Objects { Id = 10, Name="Miranda", Parent="Uranus", Color="Gray", Diameter=471, Mass=6.59e-5, OrbitalPeriod=1.413, SemiMajorAxisKm=129900, Inclination=4.338, SurfaceTemperature=-201, Composition="Ice/Rock", SurfaceFeatures="Cliffs, craters", DistanceFromEarth=2718 },
-                new Moon_Objects { Id = 11, Name="Titania", Parent="Uranus", Color="Gray", Diameter=1580, Mass=0.035, OrbitalPeriod=8.706, SemiMajorAxisKm=436300, Inclination=0.079, SurfaceTemperature=-202, Composition="Ice/Rock", SurfaceFeatures="Craters", DistanceFromEarth=2718 },
-
-                // Neptune Moons
-                new Moon_Objects { Id = 12, Name="Triton", Parent="Neptune", Color="LightBlue", Diameter=2706, Mass=0.022, OrbitalPeriod=-5.877, SemiMajorAxisKm=354800, Inclination=156.865, SurfaceTemperature=-235, Composition="Ice/Rock", SurfaceFeatures="Craters, geysers", DistanceFromEarth=4300 }
-            };
+            // This data feeds into the Layer 1 visibility and scoring engines.
+            List<Star_Objects> Stars = payload.Pool.Stars;
+            List<Planet_Objects> Planets = payload.Pool.Planets;
+            List<Moon_Objects> Moons = payload.Pool.Moons;
 
             // ═══════════════════════════════════════════════════════════════
             // STEP 2: Configure User Location & Preferences
             // This simulates the observer and their personal data/preferences.
             // ═══════════════════════════════════════════════════════════════
 
-            double userLat = 51.016; // Latitude for the observer (Londerzeel, Belgium)
-            double userLon = 4.24222; // Longitude for the observer
-            DateTime utcTime = DateTime.UtcNow; // Current time in UTC (used for ephemeris calculation)
+            // Populate the User object from the Node.js payload
+            var User = payload.User;
 
-            // Simulate user preferences for personalized recommendations
-            var User = new User_Object
-            {
-                ID = 1,
-                Name = "Raven",
-                Latitude = userLat,
-                Longitude = userLon,
-                ObservationTime = utcTime,
-                // These preferences directly influence Layer 1 scoring weights
-                LikedStars = new List<string> { "Sirius", "Procyon", "Deneb" },
-                LikedPlanets = new List<string> { "Sun", "Mars", "Venus", "Mercury" },
-                LikedMoons = new List<string> { "Europa", "Moon" }
-            };
+            // Use the coordinates and time sent from Node
+            double userLat = User.Latitude;
+            double userLon = User.Longitude;
+            DateTime utcTime = User.ObservationTime;
 
             // Display User Configuration (using helper methods defined later in Program.cs)
             PrintSectionHeader("USER INFORMATION");
@@ -136,10 +76,8 @@ namespace Poppy_Universe_Engine
             var moonEngine = new Layer1_Moon_Engine(User);
 
             // Get personalized recommendations based on user preferences. 
-            // These lists are sorted by the Layer 1 score (L1_recommendedStars[0] has the best L1 score).
             var L1_recommendedStars = starEngine.GetRecommendedStars(Stars, utcTime, User) ?? new List<Star_View>();
             var L1_recommendedPlanets = planetEngine.GetRecommendedPlanets(Planets, utcTime, User) ?? new List<Planet_View>();
-            // Moon positions depend on the parent planet's calculated position, hence the dependency on L1_recommendedPlanets.
             var L1_recommendedMoons = moonEngine.GetRecommendedMoons(Moons, L1_recommendedPlanets, utcTime) ?? new List<Moon_View>();
 
             // Display Layer 1 Results (Stars)
@@ -188,6 +126,18 @@ namespace Poppy_Universe_Engine
             PrintSectionFooter("END OF LAYER 1");
 
             // ═══════════════════════════════════════════════════════════════
+            // FINAL STEP: RETURN DATA TO NODE
+            // ═══════════════════════════════════════════════════════════════
+            // We print a marker so Node knows where the raw data is
+            Console.WriteLine("---JSON_START---");
+            Console.WriteLine(JsonSerializer.Serialize(new
+            {
+                Stars = L1_recommendedStars,
+                Planets = L1_recommendedPlanets,
+                Moons = L1_recommendedMoons
+            }));
+
+            /*// ═══════════════════════════════════════════════════════════════
             // LAYER 2: TRENDING & POPULARITY BOOST
             // Modifies L1 scores by applying a weighting based on global interaction data.
             // ═══════════════════════════════════════════════════════════════
@@ -568,7 +518,7 @@ namespace Poppy_Universe_Engine
             }
             Console.WriteLine($"   ✓ Total visible moons: {L5_recommendedMoons.Count(m => m.IsVisible)}\n");
 
-            PrintSectionFooter("END OF LAYER 5 - FINAL RECOMMENDATIONS");
+            PrintSectionFooter("END OF LAYER 5 - FINAL RECOMMENDATIONS");*/
         }
 
         // ═══════════════════════════════════════════════════════════════
@@ -598,6 +548,56 @@ namespace Poppy_Universe_Engine
             Console.WriteLine("\n" + border);
             Console.WriteLine(spacedTitle.PadLeft((70 + spacedTitle.Length) / 2).PadRight(70));
             Console.WriteLine(border + "\n");
+        }
+    }
+    public class PayloadWrapper
+    {
+        public User_Object User { get; set; }
+        public PoolWrapper Pool { get; set; }
+    }
+
+    public class PoolWrapper
+    {
+        public List<Star_Objects> Stars { get; set; }
+        public List<Planet_Objects> Planets { get; set; }
+        public List<Moon_Objects> Moons { get; set; }
+    }
+
+    public class BoolConverter : JsonConverter<bool>
+    {
+        public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                return reader.GetInt32() == 1;
+            }
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                return reader.GetString() == "1" || reader.GetString()?.ToLower() == "true";
+            }
+            return reader.GetBoolean();
+        }
+
+        public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
+        {
+            writer.WriteBooleanValue(value);
+        }
+    }
+
+    public class StringConverter : JsonConverter<string>
+    {
+        public override string Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                return reader.TryGetInt64(out long l) ? l.ToString() : reader.GetDouble().ToString();
+            }
+            return reader.GetString();
+        }
+
+        public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value);
         }
     }
 }

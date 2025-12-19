@@ -90,14 +90,6 @@ namespace Poppy_Universe_Engine
             var weatherData = visibilityCalc.FetchWeatherAsync().GetAwaiter().GetResult();
             var (weatherChance, weatherReason) = visibilityCalc.ComputeWeatherChanceWithReason(weatherData);
 
-            // 3. Define the theoretical maximum score for normalization
-            double maxScore =
-                                 2.5    // Liked stars: 0.5 * Max 5
-                               + 2.0    // Spectral preference: 0.4 * Max 5
-                               + 3.75   // Brightness (weighted 0.75 * Max 5)
-                               + 2.0;   // Synergy bonus: Max 2
-                                        // Total theoretical maximum score ≈ 10.25
-
             Random random = new Random();
 
             // 4. Calculate individual scores for each visible star
@@ -105,39 +97,78 @@ namespace Poppy_Universe_Engine
             {
                 double score = 0;
 
-                // --- Scoring Components (Raw Points) ---
+                // 1️⃣ Liked stars
+                double likedScore = user.LikedStars.Contains(s.Star.Name) ? 5 : 3;
 
-                // Liked stars: 5 points if the star is in the user's liked list.
-                double likedScore = user.LikedStars.Contains(s.Star.Name) ? 5 : 0;
+                // 2️⃣ Brightness (main driver)
+                double brightnessScore = Math.Pow(
+                    Math.Max(0, 5 - (s.Star.Gmag ?? 6.0)),
+                    1.5
+                );
 
-                // Spectral preference: 5 points if the star's spectral type matches a user favorite.
-                double spectralScore = (user.FavoriteSpectralTypes != null && user.FavoriteSpectralTypes.Contains(s.Star.SpectralType)) ? 5 : 0;
-                // 
+                // 3️⃣ Color appeal (BP-RP)
+                double colorScore = 0;
+                if (s.Star.ColorIndexBP_RP.HasValue)
+                {
+                    double color = s.Star.ColorIndexBP_RP.Value;
+                    colorScore = Math.Max(0, 2.0 - Math.Abs(color - 1.2));
+                }
 
-                // Brightness (non-linear, brighter = more appealing)
-                // Score is based on the G-band magnitude (Gmag). Lower magnitude = brighter star = higher score.
-                // The formula favors brighter stars heavily: Math.Pow(Max(0, 5 - Gmag), 1.5)
-                double brightnessScore = Math.Pow(Math.Max(0, 5 - s.Star.Gmag), 1.5);
+                // 4️⃣ Distance clarity
+                double distanceScore = 0;
+                if (s.Star.DistancePc.HasValue)
+                {
+                    distanceScore = Math.Max(0, 3.0 - Math.Log10(s.Star.DistancePc.Value + 1));
+                }
 
-                // Synergy bonus: 2 extra points if the user likes the star AND it matches a preferred spectral type.
-                double synergyBonus = (likedScore > 0 && spectralScore > 0) ? 2 : 0;
+                // 5️⃣ Temperature preference
+                double tempScore = 0;
+                if (s.Star.Teff.HasValue)
+                {
+                    double teff = s.Star.Teff.Value;
+                    tempScore = Math.Max(0, 2.5 - Math.Abs(teff - 5500) / 3000);
+                }
 
-                // Tiny random nudge: A small random value (0-0.5) to help break ties.
+                // 6️⃣ Physical presence
+                double physicalScore = 0;
+                if (s.Star.Luminosity.HasValue)
+                    physicalScore += Math.Log10(s.Star.Luminosity.Value + 1);
+
+                if (s.Star.Mass.HasValue)
+                    physicalScore += Math.Log10(s.Star.Mass.Value + 1);
+
+                // 7️⃣ Tiny chaos
                 double randomNudge = random.NextDouble() * 0.5;
 
-                // --- Final Weighted Sum ---
-                // Weights prioritize brightness (0.75) and synergy (1.0), then user preferences (0.5, 0.4).
-                score = 0.5 * likedScore +
-                        0.4 * spectralScore +
-                        0.75 * brightnessScore +
-                        synergyBonus +
-                        randomNudge;
+                // 🔥 Weighted final score (slightly boosted for better separation)
+                score =
+                    0.4 * likedScore +
+                    0.9 * brightnessScore +   // bigger weight
+                    0.4 * colorScore +        // slightly bigger
+                    0.45 * distanceScore +    // slightly bigger
+                    0.2 * tempScore +
+                    0.25 * physicalScore +    // slightly bigger
+                    randomNudge;
 
-                // Set final scores and match percentage (normalized against the max score)
+                // Optional: stretch scores non-linearly for more separation
+                score = Math.Pow(score, 1.1);
+
                 s.Score = Math.Round(score, 2);
-                s.MatchPercentage = Math.Round(Math.Min(100, (score / maxScore) * 100), 2);
+            }
 
-                // Apply the shared weather info
+            // 🔥 Normalize with headroom (prevents top star hitting 100% too early)
+            double bestScore = visibleStars.Max(s => s.Score);
+            double headroomFactor = 1.1; // 10% headroom above the current top star
+
+            foreach (var s in visibleStars)
+            {
+                // Scale relative to best star + headroom
+                double normalized = (s.Score / (bestScore * headroomFactor)) * 100;
+
+                // Clamp 0–100%
+                s.MatchPercentage = Math.Round(Math.Min(100, normalized), 2);
+
+                // Apply weather info
                 s.VisibilityChance = Math.Round(weatherChance, 2);
                 s.ChanceReason = weatherReason;
             }

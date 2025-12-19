@@ -21,7 +21,7 @@ namespace Poppy_Universe_Engine
         /// <summary>
         /// The unique system ID for the celestial object (used for cross-layer lookup).
         /// </summary>
-        public int Object_ID { get; set; }
+        public string Object_ID { get; set; }
 
         /// <summary>
         /// The broad type of the object ("Star", "Planet", or "Moon").
@@ -126,7 +126,7 @@ namespace Poppy_Universe_Engine
         public double Mass { get; set; }
         public string Composition { get; set; }
         public string SurfaceFeatures { get; set; }
-        public double Gmag { get; set; } // G-band magnitude (brightness) For Stars
+        public double? Gmag { get; set; } // G-band magnitude (brightness) For Stars
 
         // ═══════════════════════════════════════════════════════════════
         // HELPER METHODS

@@ -32,11 +32,11 @@ namespace Poppy_Universe_Engine
         {
             // --- 1. Preparation ---
 
-            // Convert RA from hours (0-24) to degrees (0-360), then to radians
-            double raRad = DegreesToRadians(star.RA_ICRS * 15);
+            // Use ?? 0 to provide a fallback if the database value is null
+            double raRad = DegreesToRadians((star.RA_ICRS ?? 0) * 15);
 
             // Declination (Dec) in radians
-            double decRad = DegreesToRadians(star.DE_ICRS);
+            double decRad = DegreesToRadians(star.DE_ICRS ?? 0);
 
             // Observer latitude in radians
             double latRad = DegreesToRadians(latitude);

@@ -24,7 +24,7 @@ namespace Poppy_Universe_Engine
         /// <summary>
         /// Unique system identifier of the moon (copied from Moon_Objects).
         /// </summary>
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Name of the parent body (e.g., "Jupiter") the moon orbits.

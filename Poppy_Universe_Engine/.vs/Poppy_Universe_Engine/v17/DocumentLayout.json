@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|c:\\users\\jelle\\onedrive - thomas more\\school\\phase_3\\semester_1\\special_project\\poppy_universe\\recommendation_engine\\poppy_universe_engine\\layer1_star_engine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|solutionrelative:layer1_star_engine.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|c:\\users\\jelle\\onedrive - thomas more\\school\\phase_3\\semester_1\\special_project\\poppy_universe\\recommendation_engine\\poppy_universe_engine\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{00FF7EB0-D8C2-419A-BDD6-F7C8C790592C}|Poppy_Universe_Engine.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
@@ -14,21 +18,34 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 0,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Layer1_Star_Engine.cs",
+              "DocumentMoniker": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Layer1_Star_Engine.cs",
+              "RelativeDocumentMoniker": "Layer1_Star_Engine.cs",
+              "ToolTip": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Layer1_Star_Engine.cs",
+              "RelativeToolTip": "Layer1_Star_Engine.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAAAmwDwAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-19T18:53:02.72Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
               "ToolTip": "C:\\Users\\Jelle\\OneDrive - Thomas More\\School\\Phase_3\\Semester_1\\Special_Project\\POPPY_Universe\\Recommendation_Engine\\Poppy_Universe_Engine\\Program.cs",
               "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAACkCAAAAAAAAAAAowEcCAAAwAAAAAAAAAA==",
+              "ViewState": "AgIAAHYAAAAAAAAAAAAgwIMAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-11-09T13:47:58.43Z",
               "EditorCaption": ""

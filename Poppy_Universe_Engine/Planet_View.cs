@@ -25,7 +25,7 @@ namespace Poppy_Universe_Engine
         /// <summary>
         /// Unique system identifier of the planet (copied from Planet_Objects).
         /// </summary>
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Classification of the planet (e.g., "Terrestrial", "Gas Giant").

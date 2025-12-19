@@ -113,7 +113,7 @@ namespace Poppy_Universe_Engine
                 var gaObject = new Layer5_Poppys_GA_Object
                 {
                     User_ID = userId,
-                    Object_ID = starView.Source,
+                    Object_ID = starView.Id,
                     Object_Type = "Star",
                     Object_Name = starView.Star.Name,
 
@@ -171,8 +171,8 @@ namespace Poppy_Universe_Engine
                     BoostDescription = planetView.BoostDescription,
                     Type = planetView.Type,
                     Color = planetView.Planet.Color,
-                    Diameter = planetView.Planet.Diameter,
-                    Mass = planetView.Planet.Mass
+                    Diameter = planetView.Planet.Diameter ?? 0,
+                    Mass = planetView.Planet.Mass ?? 0
                 };
 
                 result.Add(gaObject);
@@ -212,8 +212,8 @@ namespace Poppy_Universe_Engine
                     BoostDescription = moonView.BoostDescription,
                     Parent = moonView.Parent,
                     Color = moonView.Moon.Color,
-                    Diameter = moonView.Moon.Diameter,
-                    Mass = moonView.Moon.Mass,
+                    Diameter = (moonView.Moon.Diameter ?? 0.0),
+                    Mass = (moonView.Moon.Mass ?? 0.0),
                     Composition = moonView.Moon.Composition,
                     SurfaceFeatures = moonView.Moon.SurfaceFeatures
                 };

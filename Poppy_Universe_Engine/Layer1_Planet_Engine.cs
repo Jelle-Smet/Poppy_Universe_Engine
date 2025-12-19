@@ -145,15 +145,16 @@ namespace Poppy_Universe_Engine
                 // Liked planets: 3 points if the planet is in the user's liked list, 0 otherwise.
                 double likedScore = user.LikedPlanets.Contains(p.Planet.Name) ? 3 : 0;
 
-                // Rings: 2 points if the planet has rings.
-                double ringsScore = p.Planet.HasRings ? 2 : 0;
+                // Use (p.Planet.HasRings ?? false) to treat null as "no rings"
+                double ringsScore = (p.Planet.HasRings ?? false) ? 2 : 0;
 
                 // Comfortable temperature: 3 points if mean temperature is between -50°C and 60°C.
                 double tempScore = (p.Planet.MeanTemperature > -50 && p.Planet.MeanTemperature < 60) ? 3 : 0;
 
                 // Distance from Sun contribution (Closer to 0 means closer to Sun)
                 // This formula favors planets closer to the sun, but is likely based on internal logic.
-                double distanceScore = (1 / (p.Planet.DistanceFromSun + 1)) * 2;
+                // Use (p.Planet.DistanceFromSun ?? 0) to protect the math
+                double distanceScore = (1 / ((p.Planet.DistanceFromSun ?? 0) + 1)) * 2;
 
                 // Magnitude + distance, scaled 0-5, non-linear
                 // The raw calculation involves Absolute Magnitude (H) estimation (5 - M + 5 * log10(r * delta))

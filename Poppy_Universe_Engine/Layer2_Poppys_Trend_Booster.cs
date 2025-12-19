@@ -213,7 +213,7 @@ namespace Poppy_Universe_Engine
                 stars,
                 // Filter interactions specific to Stars
                 interactions.Where(i => i.Object_Type == "Star").ToList(),
-                s => s.Star.Id,
+                s => int.Parse(s.Star.Id),
                 s => s.Score,
                 s => s.MatchPercentage,
                 (s, pct) => s.MatchPercentage = pct, // Set new MatchPercentage
@@ -227,7 +227,7 @@ namespace Poppy_Universe_Engine
                 planets,
                 // Filter interactions specific to Planets
                 interactions.Where(i => i.Object_Type == "Planet").ToList(),
-                p => p.Planet.Id,
+                p => int.Parse(p.Planet.Id),
                 p => p.Score,
                 p => p.MatchPercentage,
                 (p, pct) => p.MatchPercentage = pct,
@@ -241,7 +241,7 @@ namespace Poppy_Universe_Engine
                 moons,
                 // Filter interactions specific to Moons
                 interactions.Where(i => i.Object_Type == "Moon").ToList(),
-                m => m.Moon.Id,
+                m => int.Parse(m.Moon.Id),
                 m => m.Score,
                 m => m.MatchPercentage,
                 (m, pct) => m.MatchPercentage = pct,

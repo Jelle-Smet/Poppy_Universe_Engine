@@ -25,12 +25,12 @@ namespace Poppy_Universe_Engine
         /// <summary>
         /// Unique system identifier of the star.
         /// </summary>
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         /// <summary>
         /// Unique source catalog identifier (e.g., Gaia ID).
         /// </summary>
-        public int Source { get; set; }
+        public string Source { get; set; }
 
         /// <summary>
         /// Spectral Type (e.g., G2V) copied for convenience in scoring layers.
