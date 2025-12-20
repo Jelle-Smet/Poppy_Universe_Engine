@@ -126,215 +126,178 @@ namespace Poppy_Universe_Engine
             PrintSectionFooter("END OF LAYER 1");
 
             // ═══════════════════════════════════════════════════════════════
-            // FINAL STEP: RETURN DATA TO NODE
+            // PREPARE FINAL RESULTS (Defaults to Layer 1)
             // ═══════════════════════════════════════════════════════════════
-            // We print a marker so Node knows where the raw data is
-            Console.WriteLine("---JSON_START---");
-            Console.WriteLine(JsonSerializer.Serialize(new
-            {
-                Stars = L1_recommendedStars,
-                Planets = L1_recommendedPlanets,
-                Moons = L1_recommendedMoons
-            }));
+            var finalStars = L1_recommendedStars;
+            var finalPlanets = L1_recommendedPlanets;
+            var finalMoons = L1_recommendedMoons;
 
-            /*// ═══════════════════════════════════════════════════════════════
+
+            // ═══════════════════════════════════════════════════════════════
             // LAYER 2: TRENDING & POPULARITY BOOST
-            // Modifies L1 scores by applying a weighting based on global interaction data.
             // ═══════════════════════════════════════════════════════════════
 
-            PrintSectionHeader("LAYER 2 BOOSTING RESULTS");
-
-            // Define simulated interaction data (Layer 2 Input)
-            List<Layer2_Interaction_Object> interactions = new List<Layer2_Interaction_Object>
+            // Only run this block if the Config says L2 is active
+            if (payload.Config != null && payload.Config.L2 && payload.Layer2Data != null)
             {
-                    // Interactions include raw counts (num_views, num_clicks, num_favorites) and 
-                    // a computed 'trending_score' which Layer_2_Poppys_Trend_Booster uses to calculate the boost.
-    
-                    // Popular Stars
-                    new Layer2_Interaction_Object { Object_Type = "Star", Object_ID = 12, total_interactions = 50, num_views = 12.5, num_clicks = 10.3, num_favorites = 8.2, trending_score = 45.1 },
-                    new Layer2_Interaction_Object { Object_Type = "Star", Object_ID = 2, total_interactions = 45, num_views = 11.0, num_clicks = 9.1, num_favorites = 7.8, trending_score = 42.5 },
-                    new Layer2_Interaction_Object { Object_Type = "Star", Object_ID = 3, total_interactions = 40, num_views = 10.0, num_clicks = 8.0, num_favorites = 6.5, trending_score = 39.8 },
-                    new Layer2_Interaction_Object { Object_Type = "Star", Object_ID = 4, total_interactions = 35, num_views = 9.5, num_clicks = 7.5, num_favorites = 6.0, trending_score = 37.2 },
+                PrintSectionHeader("LAYER 2 BOOSTING RESULTS");
 
-                    // Popular Planets
-                    new Layer2_Interaction_Object { Object_Type = "Planet", Object_ID = 1, total_interactions = 100, num_views = 25.0, num_clicks = 20.0, num_favorites = 15.0, trending_score = 80.0 }, // Sun
-                    new Layer2_Interaction_Object { Object_Type = "Planet", Object_ID = 2, total_interactions = 75, num_views = 18.0, num_clicks = 14.0, num_favorites = 10.0, trending_score = 65.0 }, // Mercury
-                    new Layer2_Interaction_Object { Object_Type = "Planet", Object_ID = 3, total_interactions = 80, num_views = 20.0, num_clicks = 16.0, num_favorites = 12.0, trending_score = 70.0 }, // Venus
-                    new Layer2_Interaction_Object { Object_Type = "Planet", Object_ID = 4, total_interactions = 90, num_views = 22.0, num_clicks = 18.0, num_favorites = 14.0, trending_score = 75.0 }, // Earth
-                    new Layer2_Interaction_Object { Object_Type = "Planet", Object_ID = 5, total_interactions = 70, num_views = 17.0, num_clicks = 13.0, num_favorites = 9.0, trending_score = 60.0 }, // Mars
+                int Top_Recommendations_Amount = 10;
+                var booster = new Layer_2_Poppys_Trend_Booster();
 
-                    // Popular Moons
-                    new Layer2_Interaction_Object { Object_Type = "Moon", Object_ID = 1, total_interactions = 30, num_views = 8.0, num_clicks = 6.0, num_favorites = 5.0, trending_score = 28.0 }, // Earth's Moon
-                    new Layer2_Interaction_Object { Object_Type = "Moon", Object_ID = 2, total_interactions = 15, num_views = 4.0, num_clicks = 3.0, num_favorites = 2.5, trending_score = 14.0 }, // Phobos
-                    new Layer2_Interaction_Object { Object_Type = "Moon", Object_ID = 3, total_interactions = 12, num_views = 3.0, num_clicks = 2.5, num_favorites = 2.0, trending_score = 11.0 }, // Deimos
-                    new Layer2_Interaction_Object { Object_Type = "Moon", Object_ID = 4, total_interactions = 25, num_views = 7.0, num_clicks = 5.5, num_favorites = 4.5, trending_score = 22.0 }, // Io
-                    new Layer2_Interaction_Object { Object_Type = "Moon", Object_ID = 9, total_interactions = 20, num_views = 6.0, num_clicks = 4.5, num_favorites = 3.5, trending_score = 19.0 } // Enceladus
-                };
-
-            // Apply the popularity boost, using L1 results as the base.
-            int Top_Recommendations_Amount = 10;
-            var booster = new Layer_2_Poppys_Trend_Booster();
-            var L2_Results = booster.BoostAll(
-                L1_recommendedStars,
-                L1_recommendedPlanets,
-                L1_recommendedMoons,
-                interactions,
-                topPerType: Top_Recommendations_Amount // Filters results to top N after boosting
-            );
-
-            // Get the boosted and filtered lists
-            var L2_recommendedStars = L2_Results.RecommendedStars;
-            var L2_recommendedPlanets = L2_Results.RecommendedPlanets;
-            var L2_recommendedMoons = L2_Results.RecommendedMoons;
+                // Use the data sent from Node instead of the hardcoded list
+                var L2_Results = booster.BoostAll(
+                    L1_recommendedStars,
+                    L1_recommendedPlanets,
+                    L1_recommendedMoons,
+                    payload.Layer2Data,
+                    topPerType: Top_Recommendations_Amount
+                );
 
 
-            // Display Layer 2 Results (Boosted)
-            Console.WriteLine("🌟 ═══════════════ POPULAR STARS (BOOSTED) ═══════════════ 🌟\n");
-            foreach (var view in L2_recommendedStars)
-            {
-                Console.WriteLine($"┌─ Star: {view.Star.Name}");
-                Console.WriteLine($"│  ID: {view.Source}");
-                Console.WriteLine($"│  Type: {view.SpectralType}");
-                Console.WriteLine($"│  Position: Alt {view.Altitude:F2}° | Az {view.Azimuth:F2}°");
-                Console.WriteLine($"│  Brightness (Gmag): {view.Star.Gmag}");
-                Console.WriteLine($"│  Visible: {view.IsVisible}");
-                // Highlight the boosted score and the boost description
-                Console.WriteLine($"│  **Boosted Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> Boost Applied: {view.BoostDescription}%");
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
+                var L2_recommendedStars = L2_Results.RecommendedStars;
+                var L2_recommendedPlanets = L2_Results.RecommendedPlanets;
+                var L2_recommendedMoons = L2_Results.RecommendedMoons;
+
+
+
+                // Display Layer 2 Results (Boosted) - Keeping all your prints!
+                Console.WriteLine("🌟 ═══════════════ POPULAR STARS (BOOSTED) ═══════════════ 🌟\n");
+                foreach (var view in L2_recommendedStars)
+                {
+                    Console.WriteLine($"┌─ Star: {view.Star.Name}");
+                    Console.WriteLine($"│  ID: {view.Source}");
+                    Console.WriteLine($"│  Type: {view.SpectralType}");
+                    Console.WriteLine($"│  Position: Alt {view.Altitude:F2}° | Az {view.Azimuth:F2}°");
+                    Console.WriteLine($"│  Brightness (Gmag): {view.Star.Gmag}");
+                    Console.WriteLine($"│  Visible: {view.IsVisible}");
+                    Console.WriteLine($"│  **Boosted Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> Boost Applied: {view.BoostDescription}%");
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible stars: {finalStars.Count(s => s.IsVisible)}\n");
+
+                Console.WriteLine("🪐 ═══════════════ POPULAR PLANETS (BOOSTED) ═══════════════ 🪐\n");
+                foreach (var view in L2_recommendedPlanets)
+                {
+                    Console.WriteLine($"┌─ Planet: {view.Planet.Name}");
+                    Console.WriteLine($"│  **Boosted Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> Boost Applied: {view.BoostDescription}%");
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible planets: {finalPlanets.Count(p => p.IsVisible)}\n");
+
+                Console.WriteLine("🌕 ═══════════════ POPULAR MOONS (BOOSTED) ═══════════════ 🌕\n");
+                foreach (var view in L2_recommendedMoons)
+                {
+                    Console.WriteLine($"┌─ Moon: {view.Moon.Name} (orbits {view.Parent})");
+                    Console.WriteLine($"│  **Boosted Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> Boost Applied: {view.BoostDescription}%");
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible moons: {finalMoons.Count(m => m.IsVisible)}\n");
+
+                PrintSectionFooter("END OF LAYER 2");
+
+                // ═══════════════════════════════════════════════════════════════
+                // PREPARE FINAL RESULTS (Defaults to Layer 1)
+                // ═══════════════════════════════════════════════════════════════
+                finalStars = L2_recommendedStars;
+                finalPlanets = L2_recommendedPlanets;
+                finalMoons = L2_recommendedMoons;
+
             }
-            Console.WriteLine($"   ✓ Total visible stars: {L2_recommendedStars.Count(s => s.IsVisible)}\n");
 
-            Console.WriteLine("🪐 ═══════════════ POPULAR PLANETS (BOOSTED) ═══════════════ 🪐\n");
-            foreach (var view in L2_recommendedPlanets)
-            {
-                Console.WriteLine($"┌─ Planet: {view.Planet.Name}");
-                // ... (output data)
-                Console.WriteLine($"│  **Boosted Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> Boost Applied: {view.BoostDescription}%");
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
-            }
-            Console.WriteLine($"   ✓ Total visible planets: {L2_recommendedPlanets.Count(p => p.IsVisible)}\n");
 
-            Console.WriteLine("🌕 ═══════════════ POPULAR MOONS (BOOSTED) ═══════════════ 🌕\n");
-            foreach (var view in L2_recommendedMoons)
-            {
-                Console.WriteLine($"┌─ Moon: {view.Moon.Name} (orbits {view.Parent})");
-                // ... (output data)
-                Console.WriteLine($"│  **Boosted Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> Boost Applied: {view.BoostDescription}%");
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
-            }
-            Console.WriteLine($"   ✓ Total visible moons: {L2_recommendedMoons.Count(m => m.IsVisible)}\n");
-
-            PrintSectionFooter("END OF LAYER 2");
 
             // ═══════════════════════════════════════════════════════════════
             // LAYER 3: PERSONALIZATION BOOST (MATRIX FACTORIZATION)
             // Applies a boost based on a calculated user preference matrix (e.g., from collaborative filtering).
             // ═══════════════════════════════════════════════════════════════
-
-            PrintSectionHeader("LAYER 3 BOOSTING RESULTS (PERSONALIZATION)");
-
-            // Define user preference matrix (L3 Input)
-            // This matrix contains pre-calculated scores (0-10) reflecting the user's affinity 
-            // for specific categories (e.g., G-type stars, Terrestrial planets).
-            Layer3_User_Matrix_Object L3_userPreferences = new Layer3_User_Matrix_Object
+            // ✅ DYNAMIC CHECK: Only run if L3 is active in Config and data is provided by Node.js
+            if (payload.Config != null && payload.Config.L3 && payload.Layer3Data != null)
             {
-                User_ID = 1,
+                PrintSectionHeader("LAYER 2 + 3: PERSONALIZATION RESULTS");
 
-                // Star preferences (spectral types)
-                A = 7.5,
-                B = 3.2,
-                F = 6.8,
-                G = 9.1,
-                K = 5.4,
-                M = 8.0,
-                O = 2.1,
+                int L3_Top_Personalized_Amount = 10;
+                var L3_personalizer = new Layer_3_Poppys_Matrix_Booster();
 
-                // Planet preferences
-                DwarfPlanet = 4.5,
-                GasGiant = 8.5,
-                IceGiant = 7.2,
-                Terrestrial = 9.0,
+                // ✨ CHAINING: We pass the results FROM Layer 2 (finalStars, etc.) into Layer 3
+                // and use payload.Layer3Data (the matrix from the DB) instead of hardcoded values.
+                var L3_Results = L3_personalizer.BoostAll(
+                    finalStars,       // Current stars (already boosted by L2)
+                    finalPlanets,     // Current planets (already boosted by L2)
+                    finalMoons,       // Current moons (already boosted by L2)
+                    payload.Layer3Data,
+                    topPerType: L3_Top_Personalized_Amount
+                );
 
-                // Moon preferences (by parent body)
-                Earth = 8.8,
-                Eris = 3.0,
-                Haumea = 2.5,
-                Jupiter = 9.5,
-                Makemake = 2.0,
-                Mars = 7.0,
-                Neptune = 6.5,
-                Pluto = 5.5,
-                Saturn = 8.0,
-                Uranus = 6.0
-            };
+                // Assign the new, L3-boosted lists
+                var L3_recommendedStars = L3_Results.RecommendedStars;
+                var L3_recommendedPlanets = L3_Results.RecommendedPlanets;
+                var L3_recommendedMoons = L3_Results.RecommendedMoons;
 
-            // Apply personalization boost (max boost ratio of 50% defined in Layer_3_Poppys_Matrix_Booster)
-            int L3_Top_Personalized_Amount = 10;
-            var L3_personalizer = new Layer_3_Poppys_Matrix_Booster();
+                // Display Layer 3 Results (Personalized)
+                Console.WriteLine("🌟 ═══════════════ PERSONALIZED STARS (LAYER 3) ═══════════════ 🌟\n");
+                foreach (var view in L3_recommendedStars)
+                {
+                    Console.WriteLine($"┌─ Star: {view.Star.Name}");
+                    // ... (output data)
+                    // Highlight the L3 personalized score
+                    Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> {view.BoostDescription}"); // Shows the L3 boost description
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible stars: {L3_recommendedStars.Count(s => s.IsVisible)}\n");
 
-            // The input here should ideally be the L2 results (L2_recommended*), as L3 builds upon L2.
-            var L3_Results = L3_personalizer.BoostAll(
-                // Assuming L2_recommended* variables contain the results from the previous block
-                L2_recommendedStars,
-                L2_recommendedPlanets,
-                L2_recommendedMoons,
-                L3_userPreferences,
-                topPerType: L3_Top_Personalized_Amount
-            );
+                // Display Layer 3 Planets
+                Console.WriteLine("🪐 ═══════════════ PERSONALIZED PLANETS (LAYER 3) ═══════════════ 🪐\n");
+                foreach (var view in L3_recommendedPlanets)
+                {
+                    // ... (output data)
+                    Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> {view.BoostDescription}");
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible planets: {L3_recommendedPlanets.Count(p => p.IsVisible)}\n");
 
-            // Assign the new, L3-boosted lists
-            var L3_recommendedStars = L3_Results.RecommendedStars;
-            var L3_recommendedPlanets = L3_Results.RecommendedPlanets;
-            var L3_recommendedMoons = L3_Results.RecommendedMoons;
+                // Display Layer 3 Moons
+                Console.WriteLine("🌕 ═══════════════ PERSONALIZED MOONS (LAYER 3) ═══════════════ 🌕\n");
+                foreach (var view in L3_recommendedMoons)
+                {
+                    // ... (output data)
+                    Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> {view.BoostDescription}");
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible moons: {L3_recommendedMoons.Count(m => m.IsVisible)}\n");
 
+                PrintSectionFooter("END OF LAYER 3");
 
-            // Display Layer 3 Results (Personalized)
-            Console.WriteLine("🌟 ═══════════════ PERSONALIZED STARS (LAYER 3) ═══════════════ 🌟\n");
-            foreach (var view in L3_recommendedStars)
-            {
-                Console.WriteLine($"┌─ Star: {view.Star.Name}");
-                // ... (output data)
-                // Highlight the L3 personalized score
-                Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> {view.BoostDescription}"); // Shows the L3 boost description
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
+                // Overwrite the final lists with the Layer 3 personalized results
+                finalStars = L3_Results.RecommendedStars;
+                finalPlanets = L3_Results.RecommendedPlanets;
+                finalMoons = L3_Results.RecommendedMoons;
             }
-            Console.WriteLine($"   ✓ Total visible stars: {L3_recommendedStars.Count(s => s.IsVisible)}\n");
-
-            // Display Layer 3 Planets
-            Console.WriteLine("🪐 ═══════════════ PERSONALIZED PLANETS (LAYER 3) ═══════════════ 🪐\n");
-            foreach (var view in L3_recommendedPlanets)
-            {
-                // ... (output data)
-                Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> {view.BoostDescription}");
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
-            }
-            Console.WriteLine($"   ✓ Total visible planets: {L3_recommendedPlanets.Count(p => p.IsVisible)}\n");
-
-            // Display Layer 3 Moons
-            Console.WriteLine("🌕 ═══════════════ PERSONALIZED MOONS (LAYER 3) ═══════════════ 🌕\n");
-            foreach (var view in L3_recommendedMoons)
-            {
-                // ... (output data)
-                Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> {view.BoostDescription}");
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
-            }
-            Console.WriteLine($"   ✓ Total visible moons: {L3_recommendedMoons.Count(m => m.IsVisible)}\n");
-
-            PrintSectionFooter("END OF LAYER 3");
 
             // ═══════════════════════════════════════════════════════════════
+            // FINAL STEP: RETURN DATA TO NODE (Only happens ONCE at the end)
+            // ═══════════════════════════════════════════════════════════════
+            Console.WriteLine("---JSON_START---");
+            Console.WriteLine(JsonSerializer.Serialize(new
+            {
+                Stars = finalStars,
+                Planets = finalPlanets,
+                Moons = finalMoons
+            }));
+
+            /*// ═══════════════════════════════════════════════════════════════
             // LAYER 4: PERSONALIZATION BOOST (NEURAL NETWORK)
             // Applies the highest-confidence boost based on learned patterns from an NN model.
             // ═══════════════════════════════════════════════════════════════
@@ -381,9 +344,9 @@ namespace Poppy_Universe_Engine
 
             // The input here should be the L3 results (L3_recommended*)
             var L4_Results = L4_personalizer.BoostAll(
-                L3_recommendedStars,
-                L3_recommendedPlanets,
-                L3_recommendedMoons,
+                L1_recommendedStars,
+                L1_recommendedPlanets,
+                L1_recommendedMoons,
                 L4_userPreferences,
                 topPerType: L4_Top_Personalized_Amount
             );
@@ -550,10 +513,22 @@ namespace Poppy_Universe_Engine
             Console.WriteLine(border + "\n");
         }
     }
+
+    public class EngineConfig
+    {
+        public bool L2 { get; set; }
+        public bool L3 { get; set; }
+        public bool L4 { get; set; }
+        public bool L5 { get; set; }
+    }
+
     public class PayloadWrapper
     {
         public User_Object User { get; set; }
         public PoolWrapper Pool { get; set; }
+        public EngineConfig Config { get; set; } // The Toggles
+        public List<Layer2_Interaction_Object> Layer2Data { get; set; } // Using existing class!
+        public Layer3_User_Matrix_Object Layer3Data { get; set; } // Using existing class!
     }
 
     public class PoolWrapper
