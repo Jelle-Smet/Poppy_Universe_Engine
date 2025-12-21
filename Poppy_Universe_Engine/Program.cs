@@ -136,7 +136,9 @@ namespace Poppy_Universe_Engine
             // ═══════════════════════════════════════════════════════════════
             // LAYER 2: TRENDING & POPULARITY BOOST
             // ═══════════════════════════════════════════════════════════════
-
+            var L2_recommendedStars = new List<Star_View>();
+            var L2_recommendedPlanets = new List<Planet_View>();
+            var L2_recommendedMoons = new List<Moon_View>();
             // Only run this block if the Config says L2 is active
             if (payload.Config != null && payload.Config.L2 && payload.Layer2Data != null)
             {
@@ -154,12 +156,9 @@ namespace Poppy_Universe_Engine
                     topPerType: Top_Recommendations_Amount
                 );
 
-
-                var L2_recommendedStars = L2_Results.RecommendedStars;
-                var L2_recommendedPlanets = L2_Results.RecommendedPlanets;
-                var L2_recommendedMoons = L2_Results.RecommendedMoons;
-
-
+                L2_recommendedStars = L2_Results.RecommendedStars;
+                L2_recommendedPlanets = L2_Results.RecommendedPlanets;
+                L2_recommendedMoons = L2_Results.RecommendedMoons;
 
                 // Display Layer 2 Results (Boosted) - Keeping all your prints!
                 Console.WriteLine("🌟 ═══════════════ POPULAR STARS (BOOSTED) ═══════════════ 🌟\n");
@@ -208,16 +207,18 @@ namespace Poppy_Universe_Engine
                 finalStars = L2_recommendedStars;
                 finalPlanets = L2_recommendedPlanets;
                 finalMoons = L2_recommendedMoons;
-
             }
-
-
 
             // ═══════════════════════════════════════════════════════════════
             // LAYER 3: PERSONALIZATION BOOST (MATRIX FACTORIZATION)
             // Applies a boost based on a calculated user preference matrix (e.g., from collaborative filtering).
             // ═══════════════════════════════════════════════════════════════
             // ✅ DYNAMIC CHECK: Only run if L3 is active in Config and data is provided by Node.js
+
+            var L3_recommendedStars = new List<Star_View>();
+            var L3_recommendedPlanets = new List<Planet_View>();
+            var L3_recommendedMoons = new List<Moon_View>();
+
             if (payload.Config != null && payload.Config.L3 && payload.Layer3Data != null)
             {
                 PrintSectionHeader("LAYER 2 + 3: PERSONALIZATION RESULTS");
@@ -236,9 +237,9 @@ namespace Poppy_Universe_Engine
                 );
 
                 // Assign the new, L3-boosted lists
-                var L3_recommendedStars = L3_Results.RecommendedStars;
-                var L3_recommendedPlanets = L3_Results.RecommendedPlanets;
-                var L3_recommendedMoons = L3_Results.RecommendedMoons;
+                L3_recommendedStars = L3_Results.RecommendedStars;
+                L3_recommendedPlanets = L3_Results.RecommendedPlanets;
+                L3_recommendedMoons = L3_Results.RecommendedMoons;
 
                 // Display Layer 3 Results (Personalized)
                 Console.WriteLine("🌟 ═══════════════ PERSONALIZED STARS (LAYER 3) ═══════════════ 🌟\n");
@@ -287,201 +288,195 @@ namespace Poppy_Universe_Engine
             }
 
             // ═══════════════════════════════════════════════════════════════
-            // FINAL STEP: RETURN DATA TO NODE (Only happens ONCE at the end)
-            // ═══════════════════════════════════════════════════════════════
-            Console.WriteLine("---JSON_START---");
-            Console.WriteLine(JsonSerializer.Serialize(new
-            {
-                Stars = finalStars,
-                Planets = finalPlanets,
-                Moons = finalMoons
-            }));
-
-            /*// ═══════════════════════════════════════════════════════════════
             // LAYER 4: PERSONALIZATION BOOST (NEURAL NETWORK)
             // Applies the highest-confidence boost based on learned patterns from an NN model.
             // ═══════════════════════════════════════════════════════════════
 
-            PrintSectionHeader("LAYER 4 BOOSTING RESULTS (PERSONALIZATION)");
+            var L4_recommendedStars = new List<Star_View>();
+            var L4_recommendedPlanets = new List<Planet_View>();
+            var L4_recommendedMoons = new List<Moon_View>();
 
-            // Define user preference matrix (L4 Input - NN Output)
-            // Values are NN-predicted scores (0-10) for maximum predicted user engagement.
-            Layer4_User_NN_Object L4_userPreferences = new Layer4_User_NN_Object
+            if (payload.Config.L4 && payload.Layer4Data != null)
             {
-                User_ID = 1,
+                PrintSectionHeader("LAYER 4 NEURAL NETWORK BOOST");
 
-                // Star preferences (spectral types)
-                A = 6.3,
-                B = 4.7,
-                F = 7.5,
-                G = 8.2,
-                K = 5.9,
-                M = 7.8,
-                O = 3.0,
+                var L4_personalizer = new Layer_4_Poppys_NN_Booster();
 
-                // Planet preferences
-                DwarfPlanet = 5.2,
-                GasGiant = 7.9,
-                IceGiant = 6.8,
-                Terrestrial = 8.7,
+                // ✨ CHAINING: Use the results from the previous active layer
+                // If L3 ran, use L3_recommendedStars. If not, use finalStars.
+                var L4_Results = L4_personalizer.BoostAll(
+                    finalStars,    // 👈 This variable holds the "latest" results from L2 or L3
+                    finalPlanets,
+                    finalMoons,
+                    payload.Layer4Data,
+                    topPerType: 10
+                );
 
-                // Moon preferences (by parent body)
-                Earth = 9.0,
-                Eris = 2.8,
-                Haumea = 3.1,
-                Jupiter = 9.2,
-                Makemake = 1.9,
-                Mars = 6.5,
-                Neptune = 7.1,
-                Pluto = 5.8,
-                Saturn = 8.3,
-                Uranus = 6.7
-            };
+                // Assign the new, L3-boosted lists
+                L4_recommendedStars = L4_Results.RecommendedStars;
+                L4_recommendedPlanets = L4_Results.RecommendedPlanets;
+                L4_recommendedMoons = L4_Results.RecommendedMoons;
 
-            // Apply NN personalization boost (max boost ratio of 75% defined in Layer_4_Poppys_NN_Booster)
-            int L4_Top_Personalized_Amount = 10;
-            var L4_personalizer = new Layer_4_Poppys_NN_Booster();
+                // Display Layer 4 Results (Personalized)
+                Console.WriteLine("🌟 ═══════════════ PERSONALIZED STARS (LAYER 4) ═══════════════ 🌟\n");
+                foreach (var view in L4_recommendedStars)
+                {
+                    Console.WriteLine($"┌─ Star: {view.Star.Name}");
+                    // ... (output data)
+                    // Highlight the final L4 score
+                    Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> {view.BoostDescription}"); // Shows the L4 NN boost description
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible stars: {L4_recommendedStars.Count(s => s.IsVisible)}\n"); // Fixed variable name here
 
-            // The input here should be the L3 results (L3_recommended*)
-            var L4_Results = L4_personalizer.BoostAll(
-                L1_recommendedStars,
-                L1_recommendedPlanets,
-                L1_recommendedMoons,
-                L4_userPreferences,
-                topPerType: L4_Top_Personalized_Amount
-            );
+                Console.WriteLine("🪐 ═══════════════ PERSONALIZED PLANETS (LAYER 4) ═══════════════ 🪐\n");
+                foreach (var view in L4_recommendedPlanets)
+                {
+                    // ... (output data)
+                    Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> {view.BoostDescription}");
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible planets: {L4_recommendedPlanets.Count(p => p.IsVisible)}\n"); // Fixed variable name here
 
-            // Assign the final score lists before rank fusion
-            var L4_recommendedStars = L4_Results.RecommendedStars;
-            var L4_recommendedPlanets = L4_Results.RecommendedPlanets;
-            var L4_recommendedMoons = L4_Results.RecommendedMoons;
+                Console.WriteLine("🌕 ═══════════════ PERSONALIZED MOONS (LAYER 4) ═══════════════ 🌕\n");
+                foreach (var view in L4_recommendedMoons)
+                {
+                    // ... (output data)
+                    Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
+                    Console.WriteLine($"│    --> {view.BoostDescription}");
+                    Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
+                    Console.WriteLine($"└─ {view.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible moons: {L4_recommendedMoons.Count(m => m.IsVisible)}\n"); // Fixed variable name here
 
+                PrintSectionFooter("END OF LAYER 4");
 
-            // Display Layer 4 Results (Personalized)
-            Console.WriteLine("🌟 ═══════════════ PERSONALIZED STARS (LAYER 4) ═══════════════ 🌟\n");
-            foreach (var view in L4_recommendedStars)
-            {
-                Console.WriteLine($"┌─ Star: {view.Star.Name}");
-                // ... (output data)
-                // Highlight the final L4 score
-                Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> {view.BoostDescription}"); // Shows the L4 NN boost description
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
+                // Update final lists for JSON return
+                finalStars = L4_Results.RecommendedStars;
+                finalPlanets = L4_Results.RecommendedPlanets;
+                finalMoons = L4_Results.RecommendedMoons;
             }
-            Console.WriteLine($"   ✓ Total visible stars: {L4_recommendedStars.Count(s => s.IsVisible)}\n"); // Fixed variable name here
 
-            Console.WriteLine("🪐 ═══════════════ PERSONALIZED PLANETS (LAYER 4) ═══════════════ 🪐\n");
-            foreach (var view in L4_recommendedPlanets)
-            {
-                // ... (output data)
-                Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> {view.BoostDescription}");
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
-            }
-            Console.WriteLine($"   ✓ Total visible planets: {L4_recommendedPlanets.Count(p => p.IsVisible)}\n"); // Fixed variable name here
-
-            Console.WriteLine("🌕 ═══════════════ PERSONALIZED MOONS (LAYER 4) ═══════════════ 🌕\n");
-            foreach (var view in L4_recommendedMoons)
-            {
-                // ... (output data)
-                Console.WriteLine($"│  **Personalized Score: {view.MatchPercentage:F2}% ({view.Score:F2})**");
-                Console.WriteLine($"│    --> {view.BoostDescription}");
-                Console.WriteLine($"│  Weather Visibility: {view.VisibilityChance}%");
-                Console.WriteLine($"└─ {view.ChanceReason}\n");
-            }
-            Console.WriteLine($"   ✓ Total visible moons: {L4_recommendedMoons.Count(m => m.IsVisible)}\n"); // Fixed variable name here
-
-            PrintSectionFooter("END OF LAYER 4");
 
             // ═══════════════════════════════════════════════════════════════
             // LAYER 5: RANK FUSION (GENETIC ALGORITHM)
             // The final stage that takes the ranked lists from L1, L2, L3, and L4, 
             // finds the optimal weight combination (W1-W4) to create a consensus, and outputs the final rankings.
             // ═══════════════════════════════════════════════════════════════
-
-            PrintSectionHeader("LAYER 5 GA RANK FUSION");
-
-            // Initialize handler and run GA optimization
-            var layer5Handler = new Layer5_Poppys_GA_Handler(seed: 42); // Seed ensures reproducible GA results
-
-            // Run GA: The GA needs the ranks from ALL four previous layers to calculate the optimal fusion weights.
-            var L5_Results = layer5Handler.RunOptimization(
-                user: User,
-                L1_Stars: L1_recommendedStars,
-                L1_Planets: L1_recommendedPlanets,
-                L1_Moons: L1_recommendedMoons,
-                L2_Stars: L2_recommendedStars,
-                L2_Planets: L2_recommendedPlanets,
-                L2_Moons: L2_recommendedMoons,
-                L3_Stars: L3_recommendedStars,
-                L3_Planets: L3_recommendedPlanets,
-                L3_Moons: L3_recommendedMoons,
-                L4_Stars: L4_recommendedStars,
-                L4_Planets: L4_recommendedPlanets,
-                L4_Moons: L4_recommendedMoons
-            );
-
-            // ═══════════════════════════════════════════════════════════════
-            // Extract optimized results
-            // The results are now of type Layer5_Poppys_GA_Object, containing all previous ranks and the final L5 score/rank.
-            // ═══════════════════════════════════════════════════════════════
-
-            var L5_recommendedStars = L5_Results.Stars ?? new List<Layer5_Poppys_GA_Object>();
-            var L5_recommendedPlanets = L5_Results.Planets ?? new List<Layer5_Poppys_GA_Object>();
-            var L5_recommendedMoons = L5_Results.Moons ?? new List<Layer5_Poppys_GA_Object>();
-
-            // ═══════════════════════════════════════════════════════════════
-            // Display Layer 5 Results (FINAL RECOMMENDATIONS)
-            // ═══════════════════════════════════════════════════════════════
-
-            Console.WriteLine("\n🌟 ═══════════════ FINAL RANKED STARS (LAYER 5 GA) ═══════════════ 🌟\n");
-            foreach (var obj in L5_recommendedStars)
+            var L5_recommendedStars = new List<Layer5_Poppys_GA_Object>();
+            var L5_recommendedPlanets = new List<Layer5_Poppys_GA_Object>();
+            var L5_recommendedMoons = new List<Layer5_Poppys_GA_Object>();
+            if (payload.Config.L5)
             {
-                Console.WriteLine($"┌─ Star: {obj.Object_Name}");
-                Console.WriteLine($"│  ID: {obj.Object_ID}");
-                Console.WriteLine($"│  Type: {obj.SpectralType}");
-                Console.WriteLine($"│  Position: Alt {obj.Altitude:F2}° | Az {obj.Azimuth:F2}°");
-                Console.WriteLine($"│  Brightness (Gmag): {obj.Gmag}");
-                Console.WriteLine($"│  Visible: {obj.IsVisible}");
-                // Highlight the final output of the entire system: L5 Rank and Score
-                Console.WriteLine($"│  **Final GA Rank: #{obj.Layer5_FinalRank + 1} (Score: {obj.Layer5_FinalScore:F4})**");
-                // Show the input ranks that determined the final rank
-                Console.WriteLine($"│  Layer Ranks: Layer 1 = {obj.Layer1_Rank + 1} | Layer 2 = {obj.Layer2_Rank + 1} | Layer 3 = {obj.Layer3_Rank + 1} | Layer 4 = {obj.Layer4_Rank + 1}");
-                Console.WriteLine($"│  Match Score: {obj.MatchPercentage:F2}%");
-                Console.WriteLine($"│  Weather Visibility: {obj.VisibilityChance}%");
-                Console.WriteLine($"└─ {obj.ChanceReason}\n");
-            }
-            Console.WriteLine($"   ✓ Total visible stars: {L5_recommendedStars.Count(s => s.IsVisible)}\n");
+                PrintSectionHeader("LAYER 5 GA RANK FUSION");
+                var layer5Handler = new Layer5_Poppys_GA_Handler(seed: 42);
 
-            Console.WriteLine("🪐 ═══════════════ FINAL RANKED PLANETS (LAYER 5 GA) ═══════════════ 🪐\n");
-            foreach (var obj in L5_recommendedPlanets)
+                var L5_Results = layer5Handler.RunOptimization(
+                    user: payload.User, // From payload
+                    L1_Stars: L1_recommendedStars,
+                    L1_Planets: L1_recommendedPlanets,
+                    L1_Moons: L1_recommendedMoons,
+                    L2_Stars: L2_recommendedStars,
+                    L2_Planets: L2_recommendedPlanets,
+                    L2_Moons: L2_recommendedMoons,
+                    L3_Stars: L3_recommendedStars,
+                    L3_Planets: L3_recommendedPlanets,
+                    L3_Moons: L3_recommendedMoons,
+                    L4_Stars: L4_recommendedStars,
+                    L4_Planets: L4_recommendedPlanets,
+                    L4_Moons: L4_recommendedMoons
+                );
+
+                L5_recommendedStars = L5_Results.Stars;
+                L5_recommendedPlanets = L5_Results.Planets;
+                L5_recommendedMoons = L5_Results.Moons;
+
+
+                // ═══════════════════════════════════════════════════════════════
+                // Display Layer 5 Results (FINAL RECOMMENDATIONS)
+                // ═══════════════════════════════════════════════════════════════
+
+                Console.WriteLine("\n🌟 ═══════════════ FINAL RANKED STARS (LAYER 5 GA) ═══════════════ 🌟\n");
+                foreach (var obj in L5_recommendedStars)
+                {
+                    Console.WriteLine($"┌─ Star: {obj.Object_Name}");
+                    Console.WriteLine($"│  ID: {obj.Object_ID}");
+                    Console.WriteLine($"│  Type: {obj.SpectralType}");
+                    Console.WriteLine($"│  Position: Alt {obj.Altitude:F2}° | Az {obj.Azimuth:F2}°");
+                    Console.WriteLine($"│  Brightness (Gmag): {obj.Gmag}");
+                    Console.WriteLine($"│  Visible: {obj.IsVisible}");
+                    // Highlight the final output of the entire system: L5 Rank and Score
+                    Console.WriteLine($"│  **Final GA Rank: #{obj.Layer5_FinalRank + 1} (Score: {obj.Layer5_FinalScore:F4})**");
+                    // Show the input ranks that determined the final rank
+                    Console.WriteLine($"│  Layer Ranks: Layer 1 = {obj.Layer1_Rank + 1} | Layer 2 = {obj.Layer2_Rank + 1} | Layer 3 = {obj.Layer3_Rank + 1} | Layer 4 = {obj.Layer4_Rank + 1}");
+                    Console.WriteLine($"│  Match Score: {obj.MatchPercentage:F2}%");
+                    Console.WriteLine($"│  Weather Visibility: {obj.VisibilityChance}%");
+                    Console.WriteLine($"└─ {obj.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible stars: {L5_recommendedStars.Count(s => s.IsVisible)}\n");
+
+                Console.WriteLine("🪐 ═══════════════ FINAL RANKED PLANETS (LAYER 5 GA) ═══════════════ 🪐\n");
+                foreach (var obj in L5_recommendedPlanets)
+                {
+                    Console.WriteLine($"┌─ Planet: {obj.Object_Name}");
+                    // ... (output data)
+                    Console.WriteLine($"│  **Final GA Rank: #{obj.Layer5_FinalRank + 1} (Score: {obj.Layer5_FinalScore:F4})**");
+                    Console.WriteLine($"│  Layer Ranks: Layer 1 = {obj.Layer1_Rank + 1} | Layer 2 = {obj.Layer2_Rank + 1} | Layer 3 = {obj.Layer3_Rank + 1} | Layer 4 = {obj.Layer4_Rank + 1}");
+                    Console.WriteLine($"│  Match Score: {obj.MatchPercentage:F2}%");
+                    Console.WriteLine($"│  Weather Visibility: {obj.VisibilityChance}%");
+                    Console.WriteLine($"└─ {obj.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible planets: {L5_recommendedPlanets.Count(p => p.IsVisible)}\n");
+
+                Console.WriteLine("🌕 ═══════════════ FINAL RANKED MOONS (LAYER 5 GA) ═══════════════ 🌕\n");
+                foreach (var obj in L5_recommendedMoons)
+                {
+                    Console.WriteLine($"┌─ Moon: {obj.Object_Name} (orbits {obj.Parent})");
+                    // ... (output data)
+                    Console.WriteLine($"│  **Final GA Rank: #{obj.Layer5_FinalRank + 1} (Score: {obj.Layer5_FinalScore:F4})**");
+                    Console.WriteLine($"│  Layer Ranks: Layer 1 = {obj.Layer1_Rank + 1} | Layer 2 = {obj.Layer2_Rank + 1} | Layer 3 = {obj.Layer3_Rank + 1} | Layer 4 ={obj.Layer4_Rank + 1}");
+                    Console.WriteLine($"│  Match Score: {obj.MatchPercentage:F2}%");
+                    Console.WriteLine($"│  Weather Visibility: {obj.VisibilityChance}%");
+                    Console.WriteLine($"└─ {obj.ChanceReason}\n");
+                }
+                Console.WriteLine($"   ✓ Total visible moons: {L5_recommendedMoons.Count(m => m.IsVisible)}\n");
+
+                PrintSectionFooter("END OF LAYER 5 - FINAL RECOMMENDATIONS");
+            }
+
+            // ═══════════════════════════════════════════════════════════════
+            // FINAL STEP: RETURN DATA TO NODE
+            // ═══════════════════════════════════════════════════════════════
+            Console.WriteLine("---JSON_START---");
+
+            // ✨ THE FIX: Explicitly cast to 'object' to satisfy the compiler
+            object finalOutputStars;
+            object finalOutputPlanets;
+            object finalOutputMoons;
+
+            if (payload.Config != null && payload.Config.L5)
             {
-                Console.WriteLine($"┌─ Planet: {obj.Object_Name}");
-                // ... (output data)
-                Console.WriteLine($"│  **Final GA Rank: #{obj.Layer5_FinalRank + 1} (Score: {obj.Layer5_FinalScore:F4})**");
-                Console.WriteLine($"│  Layer Ranks: Layer 1 = {obj.Layer1_Rank + 1} | Layer 2 = {obj.Layer2_Rank + 1} | Layer 3 = {obj.Layer3_Rank + 1} | Layer 4 = {obj.Layer4_Rank + 1}");
-                Console.WriteLine($"│  Match Score: {obj.MatchPercentage:F2}%");
-                Console.WriteLine($"│  Weather Visibility: {obj.VisibilityChance}%");
-                Console.WriteLine($"└─ {obj.ChanceReason}\n");
+                finalOutputStars = L5_recommendedStars;
+                finalOutputPlanets = L5_recommendedPlanets;
+                finalOutputMoons = L5_recommendedMoons;
             }
-            Console.WriteLine($"   ✓ Total visible planets: {L5_recommendedPlanets.Count(p => p.IsVisible)}\n");
-
-            Console.WriteLine("🌕 ═══════════════ FINAL RANKED MOONS (LAYER 5 GA) ═══════════════ 🌕\n");
-            foreach (var obj in L5_recommendedMoons)
+            else
             {
-                Console.WriteLine($"┌─ Moon: {obj.Object_Name} (orbits {obj.Parent})");
-                // ... (output data)
-                Console.WriteLine($"│  **Final GA Rank: #{obj.Layer5_FinalRank + 1} (Score: {obj.Layer5_FinalScore:F4})**");
-                Console.WriteLine($"│  Layer Ranks: Layer 1 = {obj.Layer1_Rank + 1} | Layer 2 = {obj.Layer2_Rank + 1} | Layer 3 = {obj.Layer3_Rank + 1} | Layer 4 ={obj.Layer4_Rank + 1}");
-                Console.WriteLine($"│  Match Score: {obj.MatchPercentage:F2}%");
-                Console.WriteLine($"│  Weather Visibility: {obj.VisibilityChance}%");
-                Console.WriteLine($"└─ {obj.ChanceReason}\n");
+                finalOutputStars = finalStars;
+                finalOutputPlanets = finalPlanets;
+                finalOutputMoons = finalMoons;
             }
-            Console.WriteLine($"   ✓ Total visible moons: {L5_recommendedMoons.Count(m => m.IsVisible)}\n");
 
-            PrintSectionFooter("END OF LAYER 5 - FINAL RECOMMENDATIONS");*/
+            Console.WriteLine(JsonSerializer.Serialize(new
+            {
+                Stars = finalOutputStars,
+                Planets = finalOutputPlanets,
+                Moons = finalOutputMoons
+            }));
         }
 
         // ═══════════════════════════════════════════════════════════════
@@ -529,6 +524,8 @@ namespace Poppy_Universe_Engine
         public EngineConfig Config { get; set; } // The Toggles
         public List<Layer2_Interaction_Object> Layer2Data { get; set; } // Using existing class!
         public Layer3_User_Matrix_Object Layer3Data { get; set; } // Using existing class!
+
+        public Layer4_User_NN_Object Layer4Data { get; set; } // Using existing class!
     }
 
     public class PoolWrapper

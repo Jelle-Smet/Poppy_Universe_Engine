@@ -73,6 +73,11 @@ namespace Poppy_Universe_Engine
         /// </summary>
         public int Layer5_FinalRank { get; set; }
 
+        /// <summary>
+        /// The explanation of the final rank position
+        /// </summary>
+        public string GASummary => ToString();
+
         // ═══════════════════════════════════════════════════════════════
         // DISPLAY INFORMATION (Carried forward from View objects for final presentation)
         // ═══════════════════════════════════════════════════════════════

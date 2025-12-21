@@ -118,9 +118,9 @@ namespace Poppy_Universe_Engine
                     Object_Name = starView.Star.Name,
 
                     Layer1_Rank = i,
-                    Layer2_Rank = GetRank(L2, s => s.Source == starView.Source),
-                    Layer3_Rank = GetRank(L3, s => s.Source == starView.Source),
-                    Layer4_Rank = GetRank(L4, s => s.Source == starView.Source),
+                    Layer2_Rank = GetRank(L2, s => s.Id == starView.Id),
+                    Layer3_Rank = GetRank(L3, s => s.Id == starView.Id),
+                    Layer4_Rank = GetRank(L4, s => s.Id == starView.Id),
 
                     MatchPercentage = starView.MatchPercentage,
                     Score = starView.Score,
