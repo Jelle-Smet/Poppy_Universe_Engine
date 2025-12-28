@@ -31,7 +31,7 @@ namespace Poppy_Universe_Engine
         // Constants reflecting the higher confidence placed in NN predictions
         private const double PREF_WEIGHT = 0.7;	    // Higher personalization influence (was 0.6 in L3)
         private const double BASE_WEIGHT = 0.3;	    // Lower base relevance (was 0.4 in L3)
-        private const double MAX_BOOST_RATIO = 0.75; // Higher cap at 75% (was 0.5 in L3)
+        private const double MAX_BOOST_RATIO = 0.5; // Higher cap at 75% (was 0.5 in L3)
 
         /// <summary>
         /// Normalizes an input value (v) against a maximum of 10 to produce a factor (0.0-1.0).
@@ -66,16 +66,15 @@ namespace Poppy_Universe_Engine
         /// </summary>
         private double ComputePlanetScore(Planet_View p, Layer4_User_NN_Object prefs)
         {
-            string cat = p.Planet.Type;
-            // Match the planet's type to the NN-derived preference value
-            double pref = cat switch
-            {
-                "Dwarf Planet" => prefs.DwarfPlanet,
-                "Gas Giant" => prefs.GasGiant,
-                "Ice Giant" => prefs.IceGiant,
-                "Terrestrial" => prefs.Terrestrial,
-                _ => 0
-            };
+            // ✅ FIXED: Convert to lowercase and check lowercase strings
+            string cat = (p.Planet.Type ?? "").ToLower();
+            double pref = 5.0; // Default neutral
+
+            if (cat.Contains("Dwarf")) pref = prefs.DwarfPlanet;
+            else if (cat.Contains("Gas")) pref = prefs.GasGiant;
+            else if (cat.Contains("Ice")) pref = prefs.IceGiant;
+            else if (cat.Contains("Terr")) pref = prefs.Terrestrial;
+
             return Normalize(pref);
         }
 

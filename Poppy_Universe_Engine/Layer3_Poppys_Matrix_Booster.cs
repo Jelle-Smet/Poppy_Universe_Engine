@@ -23,7 +23,7 @@ namespace Poppy_Universe_Engine
 
         private double ComputeStarScore(Star_View s, Layer3_User_Matrix_Object prefs)
         {
-            if (string.IsNullOrEmpty(s.Star.SpectralType)) return 0;
+            if (string.IsNullOrEmpty(s.Star.SpectralType)) return 0.5; // Default neutral
             string type = s.Star.SpectralType.Substring(0, 1).ToUpper();
             double pref = type switch
             {
@@ -41,12 +41,15 @@ namespace Poppy_Universe_Engine
 
         private double ComputePlanetScore(Planet_View p, Layer3_User_Matrix_Object prefs)
         {
-            string cat = p.Planet.Type ?? "";
-            double pref = 5.0;
-            if (cat.Contains("Dwarf Planet")) pref = prefs.DwarfPlanet;
-            else if (cat.Contains("Gas Giant")) pref = prefs.GasGiant;
-            else if (cat.Contains("Ice Giant")) pref = prefs.IceGiant;
-            else if (cat.Contains("Terrestrial")) pref = prefs.Terrestrial;
+            // ✅ FIXED: Convert to lowercase and check lowercase strings
+            string cat = (p.Planet.Type ?? "").ToLower();
+            double pref = 5.0; // Default neutral
+
+            if (cat.Contains("Dwarf")) pref = prefs.DwarfPlanet;
+            else if (cat.Contains("Gas")) pref = prefs.GasGiant;
+            else if (cat.Contains("Ice")) pref = prefs.IceGiant;
+            else if (cat.Contains("Terr")) pref = prefs.Terrestrial;
+
             return Normalize(pref);
         }
 
@@ -86,6 +89,7 @@ namespace Poppy_Universe_Engine
 
             List<T> currentLayerObjects = layerObjects.ToList();
 
+            // 1. Calculate the dynamic ceiling based on current results
             double maxPossibleScore = 0;
             foreach (var obj in currentLayerObjects)
             {
@@ -105,28 +109,36 @@ namespace Poppy_Universe_Engine
             {
                 double baseScore = getLayer1Score(obj);
                 double originalMatchPct = getLayer1MatchPct(obj);
-                double prefScore = getPreferenceScore(obj); // Range 0.0 to 1.0
+                double prefScore = getPreferenceScore(obj); // Normalized 0.0 to 1.0
 
-                // ✨ PURE BOOST LOGIC: 
-                // Any matrix value 0-5 results in 0 boost. 
-                // Any value 5-10 scales from 0 to maxBoostAllowed.
-                double boostMultiplier = Math.Max(0, (prefScore - 0.5) * 2);
-                double boostValue = maxBoostAllowed * boostMultiplier;
+                // ✨ IMPROVED BOOST LOGIC:
+                // The boost now scales proportionally with BOTH the preference score AND the base score
+                // This ensures that an object with 9/10 base score gets more absolute boost than 0.9/10
 
-                // Final Score is ALWAYS >= Base Score. No demotions.
-                double boostedScore = Math.Round(Math.Min(maxPossibleScore, baseScore + boostValue), 2);
+                // Step 1: Calculate preference-based multiplier (0.4 threshold)
+                double prefMultiplier = Math.Max(0, (prefScore - 0.4) * 1.67);
+
+                // Step 2: Scale the boost by the base score's position in the range
+                // Objects with higher base scores get proportionally larger boosts
+                double scoreRatio = baseScore / maxPossibleScore;
+                double scaledBoost = maxBoostAllowed * prefMultiplier * scoreRatio;
+
+                // Step 3: Apply the boost
+                double boostedScore = Math.Round(Math.Min(maxPossibleScore, baseScore + scaledBoost), 2);
                 setFinalScore(obj, boostedScore);
 
                 double newMatchPercentage = Math.Round((boostedScore / maxPossibleScore) * 100.0, 2);
                 if (newMatchPercentage > 100.00) newMatchPercentage = 100.00;
                 setMatchPct(obj, newMatchPercentage);
 
-                // Reporting logic
+                // Reporting logic: 
+                // Using 0.001 sensitivity to ensure small boosts aren't discarded as "0".
                 double pointsAdded = newMatchPercentage - originalMatchPct;
-                string finalBoostVal = pointsAdded > 0.01
+                string finalBoostVal = pointsAdded > 0.001
                     ? $"+{Math.Round(pointsAdded, 1)}% Personalized"
                     : "0";
 
+                // Map to specific View types
                 if (obj is Star_View s) s.BoostDescription = finalBoostVal;
                 else if (obj is Planet_View p) p.BoostDescription = finalBoostVal;
                 else if (obj is Moon_View m) m.BoostDescription = finalBoostVal;
@@ -148,11 +160,17 @@ namespace Poppy_Universe_Engine
         )
         {
             if (topPerType <= 0) topPerType = 5;
+
             var boostedStars = BoostScores(stars, prefs, s => s.Score, s => s.MatchPercentage, s => ComputeStarScore(s, prefs), (s, pct) => s.MatchPercentage = pct, (s, score) => s.Score = score, s => s.Score, topPerType);
             var boostedPlanets = BoostScores(planets, prefs, p => p.Score, p => p.MatchPercentage, p => ComputePlanetScore(p, prefs), (p, pct) => p.MatchPercentage = pct, (p, score) => p.Score = score, p => p.Score, topPerType);
             var boostedMoons = BoostScores(moons, prefs, m => m.Score, m => m.MatchPercentage, m => ComputeMoonScore(m, prefs), (m, pct) => m.MatchPercentage = pct, (m, score) => m.Score = score, m => m.Score, topPerType);
 
-            return new Layer3_Boost_Result { RecommendedStars = boostedStars, RecommendedPlanets = boostedPlanets, RecommendedMoons = boostedMoons };
+            return new Layer3_Boost_Result
+            {
+                RecommendedStars = boostedStars,
+                RecommendedPlanets = boostedPlanets,
+                RecommendedMoons = boostedMoons
+            };
         }
 
         internal List<object> GetCombinedTopResults(List<Star_View> stars, List<Planet_View> planets, List<Moon_View> moons, int topN = 15)
@@ -161,7 +179,11 @@ namespace Poppy_Universe_Engine
             if (stars != null) combined.AddRange(stars.Select(s => ((object)s, s.Score)));
             if (planets != null) combined.AddRange(planets.Select(p => ((object)p, p.Score)));
             if (moons != null) combined.AddRange(moons.Select(m => ((object)m, m.Score)));
-            return combined.OrderByDescending(x => x.score).Take(topN).Select(x => x.obj).ToList();
+
+            return combined.OrderByDescending(x => x.score)
+                           .Take(topN)
+                           .Select(x => x.obj)
+                           .ToList();
         }
     }
 }

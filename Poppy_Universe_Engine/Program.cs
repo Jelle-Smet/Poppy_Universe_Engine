@@ -229,9 +229,9 @@ namespace Poppy_Universe_Engine
                 // ✨ CHAINING: We pass the results FROM Layer 2 (finalStars, etc.) into Layer 3
                 // and use payload.Layer3Data (the matrix from the DB) instead of hardcoded values.
                 var L3_Results = L3_personalizer.BoostAll(
-                    finalStars,       // Current stars (already boosted by L2)
-                    finalPlanets,     // Current planets (already boosted by L2)
-                    finalMoons,       // Current moons (already boosted by L2)
+                    L1_recommendedStars,       // Current stars 
+                    L1_recommendedPlanets,     // Current planets 
+                    L1_recommendedMoons,       // Current moons 
                     payload.Layer3Data,
                     topPerType: L3_Top_Personalized_Amount
                 );
@@ -305,9 +305,9 @@ namespace Poppy_Universe_Engine
                 // ✨ CHAINING: Use the results from the previous active layer
                 // If L3 ran, use L3_recommendedStars. If not, use finalStars.
                 var L4_Results = L4_personalizer.BoostAll(
-                    finalStars,    // 👈 This variable holds the "latest" results from L2 or L3
-                    finalPlanets,
-                    finalMoons,
+                    L1_recommendedStars,    // 👈 This variable holds the "latest" results from L2 or L3
+                    L1_recommendedPlanets,
+                    L1_recommendedMoons,
                     payload.Layer4Data,
                     topPerType: 10
                 );
