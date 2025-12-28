@@ -13,3 +13,15 @@ C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\
 C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\Poppy_Universe_Engine.pdb
 C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\Poppy_Universe_Engine.genruntimeconfig.cache
 C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\ref\Poppy_Universe_Engine.dll
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\bin\Debug\net8.0\Poppy_Universe_Engine.staticwebassets.endpoints.json
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\rpswa.dswa.cache.json
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\Poppy_Universe_Engine.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\rjimswa.dswa.cache.json
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\rjsmrazor.dswa.cache.json
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\rjsmcshtml.dswa.cache.json
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\scopedcss\bundle\Poppy_Universe_Engine.styles.css
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\staticwebassets.build.json
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\staticwebassets.build.json.cache
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\staticwebassets.development.json
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\staticwebassets.build.endpoints.json
+C:\Users\Jelle\OneDrive - Thomas More\School\Phase_3\Semester_1\Special_Project\POPPY_Universe\Recommendation_Engine\Poppy_Universe_Engine\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
