@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "Poppy_Universe_Engine": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:61953;http://localhost:61954"
+    }
+  }
+}
