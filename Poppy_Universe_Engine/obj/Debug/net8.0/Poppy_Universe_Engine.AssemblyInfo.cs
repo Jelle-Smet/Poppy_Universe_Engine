@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Poppy_Universe_Engine")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a39cac7e26936629c93688ee1cbb45a8c8f70546")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1eb0fd86f52838952a9d7fcff2030ae3d0176249")]
 [assembly: System.Reflection.AssemblyProductAttribute("Poppy_Universe_Engine")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Poppy_Universe_Engine")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
